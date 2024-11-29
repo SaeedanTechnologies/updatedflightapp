@@ -361,8 +361,8 @@ class _SearchFlightViewState extends State<SearchFlightView>
                               .width(double.infinity)
                               .make()
                               .onTap(() {
-                            Get.bottomSheet( SelectAdultsBottomSheet());
-                          }),   
+                            Get.bottomSheet(SelectAdultsBottomSheet());
+                          }),
                           20.heightBox,
                           CustomButton(
                               buttonName: "Search Flight",
@@ -697,7 +697,7 @@ class _SearchFlightViewState extends State<SearchFlightView>
                               .width(double.infinity)
                               .make()
                               .onTap(() {
-                            Get.bottomSheet( SelectAdultsBottomSheet());
+                            Get.bottomSheet(SelectAdultsBottomSheet());
                           }),
                           20.heightBox,
                           CustomButton(
@@ -824,7 +824,6 @@ class _MyPopupState extends State<MyPopup> {
                         return ListTile(
                             onTap: () {
                               if (widget.isDestination == true) {
-                              
                                 controller.selectedDestination.value =
                                     snapshot.data!.data[index].title;
                                 controller.selectedDestinationCode.value =
@@ -867,7 +866,7 @@ class _MyPopupState extends State<MyPopup> {
 class SelectAdultsBottomSheet extends StatelessWidget {
   final controller = Get.put(SearchFlightController());
 
-   SelectAdultsBottomSheet({super.key});
+  SelectAdultsBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1028,7 +1027,6 @@ class SelectAdultsBottomSheet extends StatelessWidget {
                   const SizedBox(width: 10),
                   GestureDetector(
                     onTap: () {
-                      //////////////////////////////////////////////////////////////////////////////////////////////
                       // if
                       // (controller.selectedChildren.value < 0)
 
