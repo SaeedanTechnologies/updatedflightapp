@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flightbooking/app/models/getResponseModel/hotels/getCityModel.dart';
+import 'package:flightbooking/app/models/getResponseModel/hotels/getCountryModel.dart';
 import 'package:flightbooking/app/models/getResponseModel/sessions/getSessionId.dart';
 import 'package:flightbooking/app/repositories/configsRepo/configsRepo.dart';
 import 'package:flightbooking/app/utils/utils.dart';
@@ -7,6 +9,92 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 
 class HotelsRepository {
+// code by murtaza  start from here
+  final String _countryUrl =
+      'https://marketplace.beta.luxota.network/v1/countries';
+  final String _cityUrl = 'https://marketplace.beta.luxota.network/v1/cities';
+
+  Future<GetCities> fetchCities(String query) async {
+    try {
+      final response = await http.get(Uri.parse(_cityUrl));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // Filter based on the search query if it's not empty
+        final cities = (data['data'] as List)
+            .map((item) => CityData.fromJson(item))
+            .where((city) =>
+                city.title.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+        return GetCities(data: cities);
+      } else {
+        throw Exception('Failed to load cities');
+      }
+    } catch (e) {
+      throw Exception('Error fetching cities: $e');
+    }
+  }
+
+  static const String baseUrlCountry =
+      'https://marketplace.beta.luxota.network/v1/countries';
+
+  Future<List<CountryData>> fetchCountries() async {
+    try {
+      final response = await http.get(Uri.parse(baseUrlCountry));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+
+        // Map JSON to CountryData list
+        return jsonData.map((json) => CountryData.fromJson(json)).toList();
+      } else {
+        throw Exception(
+            'Failed to load countries. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching countries: $e');
+    }
+  }
+
+  // Future<List<CountryData>> fetchCountries() async {
+  //   try {
+  //     final response = await http.get(Uri.parse(baseUrlCountry));
+
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> jsonData = json.decode(response.body);
+
+  //       // Map JSON to CountryData list
+  //       return jsonData.map((json) => CountryData.fromJson(json)).toList();
+  //     } else {
+  //       throw Exception(
+  //           'Failed to load countries. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error fetching countries: $e');
+  //   }
+  // }
+
+  // Future<GetCountries> fetchCountries(String query) async {
+  //   try {
+  //     final response = await http.get(Uri.parse(_countryUrl));
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       // Filter based on the search query if it's not empty
+  //       final countries = (data['data'] as List)
+  //           .map((item) => CountryData.fromJson(item))
+  //           .where((country) =>
+  //               country.title.toLowerCase().contains(query.toLowerCase()))
+  //           .toList();
+  //       return GetCountries(data: countries);
+  //     } else {
+  //       throw Exception('Failed to load countries');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error fetching countries: $e');
+  //   }
+  // }
+
+//code from murtaza end here
+
   Future getPopularDestinations() async {
     // URL
     String url =

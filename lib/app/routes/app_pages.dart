@@ -115,7 +115,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.SEARCH_HOTELS,
-      page: () => const SearchHotelsView(),
+      page: () => SearchHotelsView(),
       binding: SearchHotelsBinding(),
     ),
     GetPage(

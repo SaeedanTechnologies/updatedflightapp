@@ -7,6 +7,9 @@ class SearchHotelsController extends GetxController {
   Rx<DateTime?> startDate = Rx<DateTime?>(DateTime.now());
   Rx<DateTime?> endDate = Rx<DateTime?>(DateTime.now());
 
+  var selectedCity = 'Select  City'.obs;
+  var selectedCountry = 'Select Country'.obs;
+
   var selectedOrigin = "DIE".obs;
   var selectedOrigincode = "".obs;
   var selectedDestination = "TIA".obs;
