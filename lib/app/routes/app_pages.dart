@@ -1,5 +1,9 @@
 import 'package:get/get.dart';
 
+import '../modules/Package/bindings/package_binding.dart';
+import '../modules/Package/views/package_view.dart';
+import '../modules/Visa/bindings/visa_binding.dart';
+import '../modules/Visa/views/visa_view.dart';
 import '../modules/authentication/forgotPassword/bindings/forgot_password_binding.dart';
 import '../modules/authentication/forgotPassword/views/forgot_password_view.dart';
 import '../modules/authentication/signin/bindings/signin_binding.dart';
@@ -162,6 +166,16 @@ class AppPages {
       name: _Paths.USER_PROFILE,
       page: () => const UserProfileView(),
       binding: UserProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.PACKAGE,
+      page: () => const PackageView(),
+      binding: PackageBinding(),
+    ),
+    GetPage(
+      name: _Paths.VISA,
+      page: () => const VisaView(),
+      binding: VisaBinding(),
     ),
   ];
 }

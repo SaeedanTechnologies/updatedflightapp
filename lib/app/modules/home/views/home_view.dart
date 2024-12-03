@@ -129,6 +129,10 @@ class HomeView extends GetView<HomeController> {
                     Get.toNamed(Routes.SEARCH_FLIGHT);
                   } else if (controller.selectedIndex.value == 1) {
                     Get.toNamed(Routes.SEARCH_HOTELS);
+                  } else if (controller.selectedIndex.value == 2) {
+                    Get.toNamed(Routes.PACKAGE);
+                  } else if (controller.selectedIndex.value == 3) {
+                    Get.toNamed(Routes.VISA);
                   }
                 },
                 readOnly: true,
@@ -200,14 +204,15 @@ class HomeView extends GetView<HomeController> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return ListView.builder(
-                              shrinkWrap: true,
+                                shrinkWrap: true,
                                 itemCount:
                                     2, // Change this according to your needs
                                 itemBuilder: (context, index) {
                                   return Shimmer.fromColors(
                                     baseColor: Colors.grey.withOpacity(0.5),
-                                    highlightColor: Colors.grey.withOpacity(0.6),
-                                     child: const ListTile(
+                                    highlightColor:
+                                        Colors.grey.withOpacity(0.6),
+                                    child: const ListTile(
                                       leading: CircleAvatar(
                                         backgroundColor: Colors.grey,
                                         radius: 30,
@@ -218,169 +223,173 @@ class HomeView extends GetView<HomeController> {
                                   );
                                 });
                           }
-           
+
                           return SizedBox(
                             height: 300.h,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                            
-                            itemCount: snapshot.data['data'].length,
+                              itemCount: snapshot.data['data'].length,
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding: defaultpad,
                                   child: Column(
-                                  crossAxisAlignment: crosstart,
-                                  children: [
-                                    const Text(
-                                      'From',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.w500,
-                                        height: 0.11,
+                                    crossAxisAlignment: crosstart,
+                                    children: [
+                                      const Text(
+                                        'From',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w500,
+                                          height: 0.11,
+                                        ),
                                       ),
-                                    ),
-                                    10.heightBox,
-                                    Row(children: [
-                                      Image.asset(
-                                        airplaneTakeoff,
-                                        width: 30,
-                                        height: 30,
-                                      ),
-                                      10.widthBox,
-                                      Column(
-                                        crossAxisAlignment: crosstart,
-                                        mainAxisAlignment: mainbetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                snapshot.data['data'][index]['origin']
-                                                    ['city_en'],
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Poppins',
-                                                  fontWeight: FontWeight.w600,
-                                                  height: 0.09,
+                                      10.heightBox,
+                                      Row(children: [
+                                        Image.asset(
+                                          airplaneTakeoff,
+                                          width: 30,
+                                          height: 30,
+                                        ),
+                                        10.widthBox,
+                                        Column(
+                                          crossAxisAlignment: crosstart,
+                                          mainAxisAlignment: mainbetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  snapshot.data['data'][index]
+                                                      ['origin']['city_en'],
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.w600,
+                                                    height: 0.09,
+                                                  ),
                                                 ),
-                                              ),
-                                              10.widthBox,
-                                              Text(
-                                                snapshot.data['data'][index]['origin']
-                                                    ['city_abb'],
+                                                10.widthBox,
+                                                Text(
+                                                  snapshot.data['data'][index]
+                                                      ['origin']['city_abb'],
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF555555),
+                                                    fontSize: 12,
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.w400,
+                                                    height: 0.14,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            10.heightBox,
+                                            SizedBox(
+                                              width: 208,
+                                              child: Text(
+                                                snapshot.data['data'][index]
+                                                        ['origin']
+                                                    ['airport_buffer_title'],
                                                 style: const TextStyle(
-                                                  color: Color(0xFF555555),
-                                                  fontSize: 12,
+                                                  color: Color(0xFF999999),
+                                                  fontSize: 10,
                                                   fontFamily: 'Poppins',
                                                   fontWeight: FontWeight.w400,
-                                                  height: 0.14,
+                                                  height: 0,
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                          10.heightBox,
-                                          SizedBox(
-                                            width: 208,
-                                            child: Text(
-                                              snapshot.data['data'][index]['origin']
-                                                  ['airport_buffer_title'],
-                                              style: const TextStyle(
-                                                color: Color(0xFF999999),
-                                                fontSize: 10,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w400,
-                                                height: 0,
                                               ),
+                                            )
+                                          ],
+                                        )
+                                      ])
+                                          .box
+                                          .border(
+                                              color: greyColor.withOpacity(0.5))
+                                          .roundedSM
+                                          .padding(defaultpad)
+                                          .make(),
+                                      20.heightBox,
+                                      const Text(
+                                        'To',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w500,
+                                          height: 0.11,
+                                        ),
+                                      ),
+                                      10.heightBox,
+                                      Row(children: [
+                                        Image.asset(
+                                          airplaneLanding,
+                                          width: 30,
+                                          height: 30,
+                                        ),
+                                        10.widthBox,
+                                        Column(
+                                          crossAxisAlignment: crosstart,
+                                          mainAxisAlignment: mainbetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  snapshot.data['data'][index]
+                                                          ['destination']
+                                                      ['city_en'],
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.w600,
+                                                    height: 0.09,
+                                                  ),
+                                                ),
+                                                10.widthBox,
+                                                Text(
+                                                  snapshot.data['data'][index]
+                                                          ['destination']
+                                                      ['city_abb'],
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF555555),
+                                                    fontSize: 12,
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.w400,
+                                                    height: 0.14,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          )
-                                        ],
-                                      )
-                                    ])
-                                        .box
-                                        .border(color: greyColor.withOpacity(0.5))
-                                        .roundedSM
-                                        .padding(defaultpad)
-                                        .make(),
-                                    20.heightBox,
-                                    const Text(
-                                      'To',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.w500,
-                                        height: 0.11,
-                                      ),
-                                    ),
-                                    10.heightBox,
-                                    Row(children: [
-                                      Image.asset(
-                                        airplaneLanding,
-                                        width: 30,
-                                        height: 30,
-                                      ),
-                                      10.widthBox,
-                                      Column(
-                                        crossAxisAlignment: crosstart,
-                                        mainAxisAlignment: mainbetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
+                                            10.heightBox,
+                                            SizedBox(
+                                              width: 208,
+                                              child: Text(
                                                 snapshot.data['data'][index]
-                                                    ['destination']['city_en'],
+                                                        ['destination']
+                                                    ['airport_buffer_title'],
                                                 style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Poppins',
-                                                  fontWeight: FontWeight.w600,
-                                                  height: 0.09,
-                                                ),
-                                              ),
-                                              10.widthBox,
-                                              Text(
-                                                snapshot.data['data'][index]
-                                                    ['destination']['city_abb'],
-                                                style: const TextStyle(
-                                                  color: Color(0xFF555555),
-                                                  fontSize: 12,
+                                                  color: Color(0xFF999999),
+                                                  fontSize: 10,
                                                   fontFamily: 'Poppins',
                                                   fontWeight: FontWeight.w400,
-                                                  height: 0.14,
+                                                  height: 0,
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                          10.heightBox,
-                                          SizedBox(
-                                            width: 208,
-                                            child: Text(
-                                              snapshot.data['data'][index]['destination']
-                                                  ['airport_buffer_title'],
-                                              style: const TextStyle(
-                                                color: Color(0xFF999999),
-                                                fontSize: 10,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w400,
-                                                height: 0,
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    ])
-                                        .box
-                                        .border(color: greyColor.withOpacity(0.5))
-                                        .roundedSM
-                                        .padding(defaultpad)
-                                        .make(),
-                                  ],
-                                                                ),
+                                            )
+                                          ],
+                                        )
+                                      ])
+                                          .box
+                                          .border(
+                                              color: greyColor.withOpacity(0.5))
+                                          .roundedSM
+                                          .padding(defaultpad)
+                                          .make(),
+                                    ],
+                                  ),
                                 );
                               },
-                              
                             ),
                           );
                         })

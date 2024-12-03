@@ -31,6 +31,8 @@ abstract class Routes {
   static const REVIEW_HOTEL_BOOKING_DETAILS =
       _Paths.REVIEW_HOTEL_BOOKING_DETAILS;
   static const USER_PROFILE = _Paths.USER_PROFILE;
+  static const PACKAGE = _Paths.PACKAGE;
+  static const VISA = _Paths.VISA;
 }
 
 abstract class _Paths {
@@ -61,4 +63,6 @@ abstract class _Paths {
   static const CARD_INFORMATION = '/card-information';
   static const REVIEW_HOTEL_BOOKING_DETAILS = '/review-hotel-booking-details';
   static const USER_PROFILE = '/user-profile';
+  static const PACKAGE = '/package';
+  static const VISA = '/visa';
 }

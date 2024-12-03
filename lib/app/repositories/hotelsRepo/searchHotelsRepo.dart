@@ -10,8 +10,7 @@ import 'package:http/http.dart' as http;
 
 class HotelsRepository {
 // code by murtaza  start from here
-  final String _countryUrl =
-      'https://marketplace.beta.luxota.network/v1/countries';
+
   final String _cityUrl = 'https://marketplace.beta.luxota.network/v1/cities';
 
   Future<GetCities> fetchCities(String query) async {
@@ -55,44 +54,6 @@ class HotelsRepository {
     }
   }
 
-  // Future<List<CountryData>> fetchCountries() async {
-  //   try {
-  //     final response = await http.get(Uri.parse(baseUrlCountry));
-
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> jsonData = json.decode(response.body);
-
-  //       // Map JSON to CountryData list
-  //       return jsonData.map((json) => CountryData.fromJson(json)).toList();
-  //     } else {
-  //       throw Exception(
-  //           'Failed to load countries. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Error fetching countries: $e');
-  //   }
-  // }
-
-  // Future<GetCountries> fetchCountries(String query) async {
-  //   try {
-  //     final response = await http.get(Uri.parse(_countryUrl));
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.body);
-  //       // Filter based on the search query if it's not empty
-  //       final countries = (data['data'] as List)
-  //           .map((item) => CountryData.fromJson(item))
-  //           .where((country) =>
-  //               country.title.toLowerCase().contains(query.toLowerCase()))
-  //           .toList();
-  //       return GetCountries(data: countries);
-  //     } else {
-  //       throw Exception('Failed to load countries');
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Error fetching countries: $e');
-  //   }
-  // }
-
 //code from murtaza end here
 
   Future getPopularDestinations() async {
@@ -128,33 +89,42 @@ class HotelsRepository {
   }
 
   ConfigRepository configRepository = ConfigRepository();
-  //Get session Id for searching flights
-  Future<GetSessionId> getSessionIdForFlightSearch(
-      {int? cityCode,
-      String? nationality,
-      String? checkinDate,
-      String? checkOutDate,
-      String? searchIdentity}) async {
+  Future<GetSessionId> getSessionIdForHotelSearch({
+    String? cityCode,
+    String? nationality,
+    String? checkinDate,
+    String? checkOutDate,
+    String? selectedAdults,
+    String? selectedChildren,
+    String? childAge,
+    String? searchIdentity,
+  }) async {
     Map<String, String> formData = {
-      "city": "5603",
-      "nationality": "105",
-      "checkInDate": "2024-12-01",
-      "checkOutDate": "2024-12-05",
-      "rooms[0][adults]": "2",
-      "rooms[0][children]": "1",
-      "rooms[0][child-age][1]": "6",
-      "rooms[1][adults]": "1",
-      "rooms[1][children]": "0",
-      "rooms[1][child-age][0]": "3",
-      "rooms[1][child-age][2]": "5",
-      "searcherIdentity": searchIdentity!,
+      "city": 123.toString(),
+      "nationality": 7.toString(),
+      "checkInDate": checkinDate ?? "",
+      "checkOutDate": checkOutDate ?? "",
+      "rooms[0][adults]": selectedAdults ?? "",
+      "rooms[0][children]": selectedChildren ?? "",
+      "rooms[0][child-age][1]": childAge ?? "",
+      "searcherIdentity": searchIdentity ?? "",
     };
+
+    // Log the form data
+    print('Form Data: $formData');
+
     try {
       EasyLoading.show(status: "Searching Hotels");
+
+      String body = formData.entries
+          .map((entry) =>
+              '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}')
+          .join('&');
+
       final response = await http.post(
         Uri.parse(
             'https://marketplace.beta.luxota.network/v1/search/hotel?lang=en&currency=158'),
-        body: jsonEncode(formData),
+        body: body,
         headers: <String, String>{
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -162,21 +132,130 @@ class HotelsRepository {
 
       if (response.statusCode == 200) {
         EasyLoading.dismiss();
-        Map<String, dynamic> data = await json.decode(response.body);
+        Map<String, dynamic> data = json.decode(response.body);
 
         return GetSessionId.fromJson(data);
       } else {
         EasyLoading.dismiss();
-
+        print("API Response: ${response.body}");
         Utils.snakbar(title: "Error", body: response.body);
-        throw Exception();
+        throw Exception("Failed to load data: ${response.body}");
       }
     } catch (error) {
       EasyLoading.dismiss();
-
-      throw Exception();
+      print("Error occurred: $error");
+      throw Exception("An error occurred while making the request.");
     }
   }
+
+  // Future<GetSessionId> getSessionIdForHotelSearch({
+  //   Int? cityCode,
+  //   String? nationality,
+  //   String? checkinDate,
+  //   String? checkOutDate,
+  //   String? selectedAdults,
+  //   String? selectedChildren,
+  //   String? childAge,
+  //   String? searchIdentity,
+  // }) async {
+  //   Map<String, String> formData = {
+  //     "city": cityCode ?? "",
+  //     "nationality": nationality ?? "",
+  //     "checkInDate": checkinDate ?? "",
+  //     "checkOutDate": checkOutDate ?? "",
+  //     "rooms[0][adults]": selectedAdults ?? "",
+  //     "rooms[0][children]": selectedChildren ?? "",
+  //     "rooms[0][child-age][1]": childAge ?? "",
+  //     "searcherIdentity": searchIdentity ?? "",
+  //   };
+
+  //   try {
+  //     EasyLoading.show(status: "Searching Hotels");
+
+  //     // Adjusting for URL-encoded form data
+  //     String body = formData.entries
+  //         .map((entry) =>
+  //             '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}')
+  //         .join('&');
+
+  //     final response = await http.post(
+  //       Uri.parse(
+  //           'https://marketplace.beta.luxota.network/v1/search/hotel?lang=en&currency=158'),
+  //       body: body,
+  //       headers: <String, String>{
+  //         'Content-Type': 'application/x-www-form-urlencoded',
+  //       },
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       EasyLoading.dismiss();
+  //       Map<String, dynamic> data = json.decode(response.body);
+
+  //       return GetSessionId.fromJson(data);
+  //     } else {
+  //       EasyLoading.dismiss();
+  //       Utils.snakbar(title: "Error", body: response.body);
+  //       throw Exception("Failed to load data: ${response.body}");
+  //     }
+  //   } catch (error) {
+  //     EasyLoading.dismiss();
+  //     print("Error occurred: $error");
+  //     throw Exception("An error occurred while making the request.");
+  //   }
+  // }
+  // ConfigRepository configRepository = ConfigRepository();
+  // //Get session Id for searching flights
+  // Future<GetSessionId> getSessionIdForHotelSearch(
+  //     {String? cityCode,
+  //     String? nationality,
+  //     String? checkinDate,
+  //     String? checkOutDate,
+  //     String? selectedAdults,
+  //     String? selectedChildren,
+  //     String? childAge,
+  //     String? searchIdentity}) async {
+  //   Map<String, String> formData = {
+  //     "city": cityCode!,
+  //     "nationality": nationality!,
+  //     "checkInDate": checkinDate!,
+  //     "checkOutDate": checkOutDate!,
+  //     "rooms[0][adults]": selectedAdults!,
+  //     "rooms[0][children]": selectedChildren!,
+  //     "rooms[0][child-age][1]": childAge!,
+  //     // "rooms[1][adults]": "1",
+  //     // "rooms[1][children]": "0",
+  //     // "rooms[1][child-age][0]": "3",
+  //     // "rooms[1][child-age][2]": "5",
+  //     "searcherIdentity": searchIdentity!,
+  //   };
+  //   try {
+  //     EasyLoading.show(status: "Searching Hotels");
+  //     final response = await http.post(
+  //       Uri.parse(
+  //           'https://marketplace.beta.luxota.network/v1/search/hotel?lang=en&currency=158'),
+  //       body: jsonEncode(formData),
+  //       headers: <String, String>{
+  //         'Content-Type': 'application/x-www-form-urlencoded',
+  //       },
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       EasyLoading.dismiss();
+  //       Map<String, dynamic> data = await json.decode(response.body);
+
+  //       return GetSessionId.fromJson(data);
+  //     } else {
+  //       EasyLoading.dismiss();
+
+  //       Utils.snakbar(title: "Error", body: response.body);
+  //       throw Exception();
+  //     }
+  //   } catch (error) {
+  //     EasyLoading.dismiss();
+
+  //     throw Exception();//througying this exception
+  //   }
+  // }
 
   // Future<GetSessionId> searchHotels(dynamic data) async {
   //   try {

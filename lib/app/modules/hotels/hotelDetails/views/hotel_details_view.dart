@@ -1,9 +1,6 @@
-// import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flightbooking/app/commonWidgtes/customelevatedButton.dart';
 import 'package:flightbooking/app/resources/alignments.dart';
 import 'package:flightbooking/app/resources/colors.dart';
-import 'package:flightbooking/app/resources/icons.dart';
 import 'package:flightbooking/app/resources/paddings.dart';
 import 'package:flightbooking/app/resources/physics.dart';
 import 'package:flightbooking/app/routes/app_pages.dart';
