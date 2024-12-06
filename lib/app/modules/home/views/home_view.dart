@@ -71,7 +71,7 @@ class HomeView extends GetView<HomeController> {
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
-                itemCount: 4,
+                itemCount: 6,
                 itemBuilder: (context, index) {
                   return Obx(
                     () => Row(
@@ -83,7 +83,11 @@ class HomeView extends GetView<HomeController> {
                                   ? "assets/icons/hotels.png"
                                   : index == 2
                                       ? "assets/icons/packages.png"
-                                      : "assets/icons/visas.png",
+                                      : index == 3
+                                          ? "assets/icons/packages.png"
+                                          : index == 4
+                                              ? "assets/icons/packages.png"
+                                              : "assets/icons/packages.png",
                           width: 30,
                           height: 30,
                           color: controller.selectedIndex.value == index
@@ -97,7 +101,11 @@ class HomeView extends GetView<HomeController> {
                                   ? "Hotels"
                                   : index == 2
                                       ? "Packages"
-                                      : "Visas",
+                                      : index == 3
+                                          ? "Visas"
+                                          : index == 4
+                                              ? "Tour"
+                                              : "Event",
                           style: TextStyle(
                               color: controller.selectedIndex.value == index
                                   ? whitecolor
@@ -133,6 +141,10 @@ class HomeView extends GetView<HomeController> {
                     Get.toNamed(Routes.PACKAGE);
                   } else if (controller.selectedIndex.value == 3) {
                     Get.toNamed(Routes.VISA);
+                  } else if (controller.selectedIndex.value == 4) {
+                    Get.toNamed(Routes.TOUR);
+                  } else if (controller.selectedIndex.value == 5) {
+                    Get.toNamed(Routes.EVENT);
                   }
                 },
                 readOnly: true,
@@ -166,7 +178,11 @@ class HomeView extends GetView<HomeController> {
                             ? "Find Hotels"
                             : controller.selectedIndex.value == 2
                                 ? "Find packages"
-                                : "Find Visas",
+                                : controller.selectedIndex.value == 3
+                                    ? "Find Visas"
+                                    : controller.selectedIndex.value == 4
+                                        ? "Find Tours"
+                                        : "Find Events",
                     hintStyle: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w500,

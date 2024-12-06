@@ -2,8 +2,8 @@ import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:flightbooking/app/commonWidgtes/customelevatedButton.dart';
 import 'package:flightbooking/app/models/getResponseModel/hotels/getCityModel.dart';
 import 'package:flightbooking/app/models/getResponseModel/hotels/getCountryModel.dart';
+import 'package:flightbooking/app/modules/hotels/searchHotels/controllers/rriomcon.dart';
 import 'package:flightbooking/app/repositories/hotelsRepo/searchHotelsRepo.dart';
-import 'package:flightbooking/app/resources/alignments.dart';
 import 'package:flightbooking/app/resources/colors.dart';
 import 'package:flightbooking/app/resources/icons.dart';
 import 'package:flightbooking/app/resources/paddings.dart';
@@ -17,7 +17,8 @@ import 'package:velocity_x/velocity_x.dart';
 import '../controllers/search_hotels_controller.dart';
 
 class SearchHotelsView extends GetView<SearchHotelsController> {
-  const SearchHotelsView({Key? key}) : super(key: key);
+  final RoomController roomController = Get.put(RoomController());
+  SearchHotelsView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -314,67 +315,107 @@ class SearchHotelsView extends GetView<SearchHotelsController> {
             ),
           ),
           10.heightBox,
-          Column(
-            crossAxisAlignment: crosstart,
+
+          Row(
             children: [
-              Row(
-                children: [
-                  Obx(
-                    () => Text(
-                      controller.selectedTravelers.value > 0
-                          ? "${controller.selectedTravelers.value} Travellers"
-                          : "Select Travelers",
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
-                        height: 0.12,
-                      ),
-                    ),
+              Obx(
+                () => Text(
+                  roomController.travellers.value > 0
+                      ? "${roomController.travellers.value} Travellers"
+                      : "Select Travelers",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                    height: 0.12,
                   ),
-                  10.widthBox,
-                  // Image.asset(
-                  //   "assets/icons/dot.png",
-                  //   height: 5,
-                  //   width: 5,
-                  // ),
-                  // 5.widthBox,
-                  // Obx(
-                  //   () => Text(
-                  //     controller.selectedClass.value,
-                  //     style: const TextStyle(
-                  //       color: Colors.black,
-                  //       fontSize: 14,
-                  //       fontFamily: 'Poppins',
-                  //       fontWeight: FontWeight.w500,
-                  //       height: 0.12,
-                  //     ),
-                  //   ),
-                  // ),
-                  5.widthBox,
-                  Image.asset(
-                    "assets/icons/dropdown.png",
-                    height: 20,
-                    width: 20,
-                    fit: BoxFit.cover,
-                  )
-                ],
-              )
+                ),
+              ),
+              20.widthBox,
+              ElevatedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => RoomBottomSheet(),
+                  );
+                },
+                child: const Text(
+                  "Select Travellers",
+                  style: const TextStyle(
+                    color: primaycolor,
+                    fontSize: 14,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                    height: 0.12,
+                  ),
+                ),
+              ),
             ],
-          )
-              .box
-              .border(color: greyColor.withOpacity(0.6))
-              .roundedSM
-              .clip(Clip.antiAlias)
-              .padding(pad16)
-              .width(double.infinity)
-              .make()
-              .onTap(() {
-            Get.bottomSheet(
-                // SelectAdultsBottomSheet()
-                AdultSelectionBottomSheet());
-          }),
+          ),
+          // old Trevellers selection code
+          // Column(
+          //   crossAxisAlignment: crosstart,
+          //   children: [
+          //     Row(
+          //       children: [
+          //         Obx(
+          //           () => Text(
+          //             controller.selectedTravelers.value > 0
+          //                 ? "${controller.selectedTravelers.value} Travellers"
+          //                 : "Select Travelers",
+          //             style: const TextStyle(
+          //               color: Colors.black,
+          //               fontSize: 14,
+          //               fontFamily: 'Poppins',
+          //               fontWeight: FontWeight.w500,
+          //               height: 0.12,
+          //             ),
+          //           ),
+          //         ),
+          //         10.widthBox,
+          //         // Image.asset(
+          //         //   "assets/icons/dot.png",
+          //         //   height: 5,
+          //         //   width: 5,
+          //         // ),
+          //         // 5.widthBox,
+          //         // Obx(
+          //         //   () => Text(
+          //         //     controller.selectedClass.value,
+          //         //     style: const TextStyle(
+          //         //       color: Colors.black,
+          //         //       fontSize: 14,
+          //         //       fontFamily: 'Poppins',
+          //         //       fontWeight: FontWeight.w500,
+          //         //       height: 0.12,
+          //         //     ),
+          //         //   ),
+          //         // ),
+          //         5.widthBox,
+          //         Image.asset(
+          //           "assets/icons/dropdown.png",
+          //           height: 20,
+          //           width: 20,
+          //           fit: BoxFit.cover,
+          //         )
+          //       ],
+          //     )
+          //   ],
+          // )
+          //     .box
+          //     .border(color: greyColor.withOpacity(0.6))
+          //     .roundedSM
+          //     .clip(Clip.antiAlias)
+          //     .padding(pad16)
+          //     .width(double.infinity)
+          //     .make()
+          //     .onTap(() {
+          //   Get.bottomSheet(
+          //       // SelectAdultsBottomSheet()
+          //       AdultSelectionBottomSheet());
+          // }),
           20.heightBox,
           CustomButton(
               buttonName: "Search Hotel",
@@ -467,6 +508,7 @@ class _MyPopupState extends State<MyPopup> {
                           return ListTile(
                             onTap: () {
                               controller.selectedCity.value = city.title;
+                              controller.cityId.value = city.id;
                               Get.back();
                             },
                             title: Text(city.title),
@@ -477,6 +519,7 @@ class _MyPopupState extends State<MyPopup> {
                             onTap: () {
                               controller.selectedNationality.value =
                                   country.title;
+                              controller.countryId.value = country.id;
                               Get.back();
                             },
                             title: Text(country.title),
@@ -514,167 +557,167 @@ class AdultSelectionBottomSheet extends StatelessWidget {
           children: [
             Expanded(
               child: Obx(() {
-                return SingleChildScrollView(
-                  child: Column(
-                    children:
-                        List.generate(controller.rooms.length, (roomIndex) {
-                      final room = controller.rooms[roomIndex];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Room Header with Remove Icon
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Room ${roomIndex + 1}",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close,
-                                        color: Colors.red),
-                                    onPressed: () =>
-                                        controller.removeRoom(roomIndex),
-                                  ),
-                                ],
-                              ),
-                              const Divider(),
-                              // Adults Row
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text("Adults",
-                                      style: TextStyle(fontSize: 16)),
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove,
-                                            color: primaycolor),
-                                        onPressed: () {
-                                          if (controller.selectedAdults.value >
-                                              0) {
-                                            controller.selectedAdults.value--;
-                                            controller
-                                                .selectedTravelers.value--;
-                                          }
-                                        },
-                                      ),
-                                      Obx(() => Text(controller
-                                          .selectedAdults.value
-                                          .toString())),
-                                      IconButton(
-                                          icon: const Icon(Icons.add,
-                                              color: primaycolor),
-                                          onPressed: () {
-                                            controller.selectedAdults.value++;
-                                            controller
-                                                .selectedTravelers.value++;
-                                          }),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              // Children Row
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text("Children",
-                                      style: TextStyle(fontSize: 16)),
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove,
-                                            color: primaycolor),
-                                        onPressed: () {
-                                          if (controller.selectedAdults.value >
-                                              0) {
-                                            controller.selectedChildren.value--;
-                                            controller
-                                                .selectedTravelers.value--;
-                                            controller
-                                                .rooms[roomIndex].childAges
-                                                .removeLast();
-                                          }
-                                        },
-                                      ),
-                                      Obx(() => Text(controller
-                                          .selectedChildren.value
-                                          .toString())),
-                                      IconButton(
-                                        icon: const Icon(Icons.add,
-                                            color: primaycolor),
-                                        onPressed: () {
-                                          controller.selectedChildren.value++;
-                                          controller.selectedTravelers.value++;
-                                          controller.rooms[roomIndex].childAges
-                                              .add(1);
-                                          // controller.childAges.add(index++);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const Divider(),
-                              // Dynamic Child Ages
-                              Obx(() {
-                                return Column(
-                                  children: List.generate(room.childAges.length,
-                                      (index) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Child Age ${index + 1}",
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                              icon: const Icon(Icons.remove,
-                                                  color: primaycolor),
-                                              onPressed: () =>
-                                                  room.decrementChildAge(index),
-                                            ),
-                                            Text(room.childAges[index]
-                                                .toString()),
-                                            IconButton(
-                                              icon: const Icon(Icons.add,
-                                                  color: primaycolor),
-                                              onPressed: () =>
-                                                  room.incrementChildAge(index),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                                );
-                              }),
-                            ],
-                          ),
+                return ListView.builder(
+                  itemCount: controller.rooms.length,
+                  itemBuilder: (context, roomIndex) {
+                    final room = controller.rooms[roomIndex];
+                    print("Rooms count: ${controller.rooms.length}");
+                    print("Room: ${room}");
+                    print("Index: $roomIndex");
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      );
-                    }),
-                  ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Room Header with Remove Icon
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Room ${roomIndex + 1}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close,
+                                      color: Colors.red),
+                                  onPressed: () =>
+                                      controller.removeRoom(roomIndex),
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                            // Adults Row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text("Adults",
+                                    style: TextStyle(fontSize: 16)),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove,
+                                          color: primaycolor),
+                                      onPressed: () {
+                                        if (controller.selectedAdults.value >
+                                            0) {
+                                          controller.selectedAdults.value--;
+                                          controller.selectedTravelers.value--;
+                                        }
+                                      },
+                                    ),
+                                    Obx(() => Text(controller
+                                        .selectedAdults.value
+                                        .toString())),
+                                    IconButton(
+                                      icon: const Icon(Icons.add,
+                                          color: primaycolor),
+                                      onPressed: () {
+                                        controller.selectedAdults.value++;
+                                        controller.selectedTravelers.value++;
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            // Children Row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text("Children",
+                                    style: TextStyle(fontSize: 16)),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove,
+                                          color: primaycolor),
+                                      onPressed: () {
+                                        if (controller.selectedChildren.value >
+                                            0) {
+                                          controller.selectedChildren.value--;
+                                          controller.selectedTravelers.value--;
+                                          controller.rooms[roomIndex].childAges
+                                              .removeLast();
+                                        }
+                                      },
+                                    ),
+                                    Obx(() => Text(controller
+                                        .selectedChildren.value
+                                        .toString())),
+                                    IconButton(
+                                      icon: const Icon(Icons.add,
+                                          color: primaycolor),
+                                      onPressed: () {
+                                        controller.selectedChildren.value++;
+                                        controller.selectedTravelers.value++;
+                                        controller.rooms[roomIndex].childAges
+                                            .add(1);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                            // Dynamic Child Ages
+                            Obx(() {
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: room.childAges.length,
+                                itemBuilder: (context, index) {
+                                  print(
+                                      "Child age count: ${room.childAges.length}");
+                                  print("Index: $index");
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Child Age ${index + 1}",
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.remove,
+                                                color: primaycolor),
+                                            onPressed: () =>
+                                                room.decrementChildAge(index),
+                                          ),
+                                          Text(
+                                              room.childAges[index].toString()),
+                                          IconButton(
+                                            icon: const Icon(Icons.add,
+                                                color: primaycolor),
+                                            onPressed: () =>
+                                                room.incrementChildAge(index),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 );
               }),
             ),
+
             // Add Another Room Button
             Align(
               alignment: Alignment.topLeft,
@@ -707,4 +750,278 @@ class AdultSelectionBottomSheet extends StatelessWidget {
       ),
     );
   }
+} /////////////////////////////////////////////////////////////////
+
+class RoomBottomSheet extends StatelessWidget {
+  final RoomController roomController = Get.put(RoomController());
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.8,
+      maxChildSize: 0.8,
+      builder: (_, controller) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Rooms",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Obx(() => Expanded(
+                    child: ListView.builder(
+                      controller: controller,
+                      itemCount: roomController.rooms.length,
+                      itemBuilder: (_, index) {
+                        final room = roomController.rooms[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Room ${index + 1}",
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600)),
+                                    if (index > 0)
+                                      IconButton(
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.red),
+                                        onPressed: () =>
+                                            roomController.removeRoom(index),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                _buildCounter(
+                                  title: "Adults",
+                                  count: room["adults"],
+                                  onIncrement: () =>
+                                      roomController.incrementAdults(index),
+                                  onDecrement: () =>
+                                      roomController.decrementAdults(index),
+                                ),
+                                const SizedBox(height: 10),
+                                _buildCounter(
+                                  title: "Children",
+                                  count: room["children"],
+                                  onIncrement: () =>
+                                      roomController.incrementChildren(index),
+                                  onDecrement: () =>
+                                      roomController.decrementChildren(index),
+                                ),
+                                if (room["children"] > 0) ...[
+                                  const SizedBox(height: 10),
+                                  const Text("Child Ages",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 5),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: room["childAges"].length,
+                                    itemBuilder: (_, childIndex) {
+                                      return _buildCounter(
+                                        title: "Child ${childIndex + 1} Age",
+                                        count: room["childAges"][childIndex],
+                                        onIncrement: () =>
+                                            roomController.incrementChildAge(
+                                                index, childIndex),
+                                        onDecrement: () =>
+                                            roomController.decrementChildAge(
+                                                index, childIndex),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  )),
+              ElevatedButton(
+                onPressed: roomController.addRoom,
+                child: const Text("Add Another Room"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  roomController.printRooms();
+                },
+                child: const Text("Print Room Data"),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCounter({
+    required String title,
+    required int count,
+    required VoidCallback onIncrement,
+    required VoidCallback onDecrement,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16),
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.remove),
+              onPressed: onDecrement,
+            ),
+            Text("$count", style: const TextStyle(fontSize: 16)),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: onIncrement,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
+
+///////////////////////////////////////////////////////////////////
+// class RoomBottomSheet extends StatelessWidget {
+//   final RoomController roomController = Get.put(RoomController());
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // return
+//     //  Obx(() {
+//     return DraggableScrollableSheet(
+//       initialChildSize: 0.6,
+//       maxChildSize: 0.8,
+//       builder: (_, controller) {
+//         return Container(
+//           padding: const EdgeInsets.all(16.0),
+//           decoration: const BoxDecoration(
+//             color: Colors.white,
+//             borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+//           ),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               const Text(
+//                 "Rooms",
+//                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//               ),
+//               Obx(() => Expanded(
+//                     child: ListView.builder(
+//                       controller: controller,
+//                       itemCount: roomController.rooms.length,
+//                       itemBuilder: (_, index) {
+//                         final room = roomController.rooms[index];
+//                         return Card(
+//                           margin: const EdgeInsets.symmetric(vertical: 8.0),
+//                           child: Padding(
+//                             padding: const EdgeInsets.all(16.0),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Row(
+//                                   mainAxisAlignment:
+//                                       MainAxisAlignment.spaceBetween,
+//                                   children: [
+//                                     Text("Room ${index + 1}",
+//                                         style: const TextStyle(
+//                                             fontSize: 18,
+//                                             fontWeight: FontWeight.w600)),
+//                                     if (index > 0)
+//                                       IconButton(
+//                                         icon: const Icon(Icons.delete,
+//                                             color: Colors.red),
+//                                         onPressed: () =>
+//                                             roomController.removeRoom(index),
+//                                       ),
+//                                   ],
+//                                 ),
+//                                 const SizedBox(height: 10),
+//                                 _buildCounter(
+//                                   title: "Adults",
+//                                   count: room["adults"]!,
+//                                   onIncrement: () =>
+//                                       roomController.incrementAdults(index),
+//                                   onDecrement: () =>
+//                                       roomController.decrementAdults(index),
+//                                 ),
+//                                 const SizedBox(height: 10),
+//                                 _buildCounter(
+//                                   title: "Children",
+//                                   count: room["children"]!,
+//                                   onIncrement: () =>
+//                                       roomController.incrementChildren(index),
+//                                   onDecrement: () =>
+//                                       roomController.decrementChildren(index),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         );
+//                       },
+//                     ),
+//                   )),
+//               ElevatedButton(
+//                 onPressed: roomController.addRoom,
+//                 child: const Text("Add Another Room"),
+//               ),
+//             ],
+//           ),
+//         );
+//       },
+//     );
+//     // });
+//   }
+
+//   Widget _buildCounter({
+//     required String title,
+//     required int count,
+//     required VoidCallback onIncrement,
+//     required VoidCallback onDecrement,
+//   }) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//       children: [
+//         Text(
+//           title,
+//           style: const TextStyle(fontSize: 16),
+//         ),
+//         Row(
+//           children: [
+//             IconButton(
+//               icon: const Icon(Icons.remove),
+//               onPressed: onDecrement,
+//             ),
+//             Text("$count", style: const TextStyle(fontSize: 16)),
+//             IconButton(
+//               icon: const Icon(Icons.add),
+//               onPressed: onIncrement,
+//             ),
+//           ],
+//         ),
+//       ],
+//     );
+//   }
+// }

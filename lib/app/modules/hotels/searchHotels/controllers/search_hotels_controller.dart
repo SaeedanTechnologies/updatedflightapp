@@ -19,6 +19,8 @@ class SearchHotelsController extends GetxController {
   var selectedChildren = 0.obs;
   var childAge = 0.obs;
   var selectedNationality = 'Select Nationality'.obs;
+  var cityId = 0.obs;
+  var countryId = 0.obs;
 
   String formatDate(DateTime? date) {
     if (date != null) {
@@ -41,8 +43,8 @@ class SearchHotelsController extends GetxController {
 
     // Send request to get search results
     var getSessionId = await hotelsRepository.getSessionIdForHotelSearch(
-      cityCode: selectedCity.value, // City ID or name from your logic
-      nationality: selectedNationality.value, // Nationality ID or code
+      cityCode: cityId.value, // City ID or name from your logic
+      nationality: countryId.value, // Nationality ID or code
       checkinDate: startDate.value != null ? formatDate(startDate.value!) : '',
       checkOutDate: endDate.value != null ? formatDate(endDate.value!) : '',
       selectedAdults: selectedAdults.value.toString(),
@@ -52,12 +54,11 @@ class SearchHotelsController extends GetxController {
     );
     print(getSessionId);
 
-    // var result = await hotelsRepository.getsearchHotelResults(
-    //     sessionId: getSessionId.sessionId!,
+    var result = await hotelsRepository.getsearchHotelResults(
+      sessionId: getSessionId.sessionId!,
+    );
 
-    //     );
-
-    // return result;
+    return result;
   }
 
   //adult selection bottom sheet code by murtaza
@@ -98,6 +99,14 @@ class SearchHotelsController extends GetxController {
 
   void addRoom() {
     rooms.add(RoomModel());
+
+    print("All Rooms:");
+    for (int i = 0; i < rooms.length; i++) {
+      print(
+          "Room $i -> Adults: ${rooms[i].adults.value}, Children: ${rooms[i].children.value}, Child Ages: ${rooms[i].childAges}");
+    }
+
+    // print(rooms);
   }
 
   void removeRoom(int index) {
@@ -108,9 +117,9 @@ class SearchHotelsController extends GetxController {
 }
 
 class RoomModel {
-  var adults = 2.obs;
-  var children = 0.obs;
-  var childAges = <int>[].obs;
+  var adults = RxInt(2); // Default adults count is 2
+  var children = RxInt(0); // Default children count is 0
+  var childAges = RxList<int>(); // Default empty list for child ages
 
   void incrementAdults() => adults.value++;
   void decrementAdults() {
@@ -130,10 +139,14 @@ class RoomModel {
   }
 
   void incrementChildAge(int index) {
+    print(" oo ${childAges[index]}");
+    print("object   ${index}");
+    print("bnbnbnbn ${childAges}");
     if (childAges[index] < 18) childAges[index]++;
   }
 
   void decrementChildAge(int index) {
+    print(" hgvbnn ${childAges[index]}");
     if (childAges[index] > 1) childAges[index]--;
   }
 }

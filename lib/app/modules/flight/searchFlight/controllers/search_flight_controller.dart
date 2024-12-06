@@ -4,9 +4,9 @@ import 'package:flightbooking/app/repositories/configsRepo/configsRepo.dart';
 import 'package:flightbooking/app/repositories/flightsRepo/flightsRepo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class SearchFlightController extends GetxController {
-
   var selectedOrigin = "DIE".obs;
   var selectedOrigincode = "".obs;
   var selectedDestination = "TIA".obs;
@@ -79,6 +79,12 @@ class SearchFlightController extends GetxController {
 
     var result = await searchFlightRepository.getsearchFlightsResults(
         sessionId: getSessionId.sessionId!, tripType: tripType);
+    print("refId $result");
+    var referenceId = result["data"][0]["flightBufferReferenceId"];
+    print(" referenceId $referenceId");
+    final storage = GetStorage();
+    storage.write('referenceId', referenceId);
+    print('storedReferenceId is ${storage.read('referenceId')}');
 
     return result;
   }
@@ -96,9 +102,5 @@ class SearchFlightController extends GetxController {
     endDate.value = date;
   }
 
-var getairportsModel= GetAirports(data: [],status: false).obs;
-
-
-
-   
+  var getairportsModel = GetAirports(data: [], status: false).obs;
 }

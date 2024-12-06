@@ -1,5 +1,6 @@
 import 'package:flightbooking/app/commonWidgtes/customelevatedButton.dart';
 import 'package:flightbooking/app/models/getResponseModel/hotels/getFlightRules.dart';
+import 'package:flightbooking/app/repositories/flightsRepo/flightsRepo.dart';
 import 'package:flightbooking/app/resources/alignments.dart';
 import 'package:flightbooking/app/resources/colors.dart';
 import 'package:flightbooking/app/resources/icons.dart';
@@ -14,7 +15,8 @@ import 'package:velocity_x/velocity_x.dart';
 import '../controllers/flight_details_controller.dart';
 
 class FlightDetailsView extends GetView<FlightDetailsController> {
-  const FlightDetailsView({Key? key}) : super(key: key);
+  final FlightsRepository flightsRepository = FlightsRepository();
+  FlightDetailsView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     var flightDetails = Get.arguments[0];
@@ -55,6 +57,8 @@ class FlightDetailsView extends GetView<FlightDetailsController> {
                 CustomButton(
                     buttonName: "Continue",
                     onPressed: () {
+                      flightsRepository.createBookingRequest();
+
                       Get.toNamed(Routes.ADD_PASSENGER);
                       // Get.bottomSheet(
                       //   Container(

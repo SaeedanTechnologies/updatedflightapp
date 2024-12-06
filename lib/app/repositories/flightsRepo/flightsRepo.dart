@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'package:flightbooking/app/models/getResponseModel/flight/getAirportmodel.dart';
 import 'package:flightbooking/app/models/getResponseModel/hotels/getFlightRules.dart';
 import 'package:flightbooking/app/models/getResponseModel/sessions/getSessionId.dart';
+import 'package:flightbooking/app/modules/flight/addPassenger/views/dynamic_form_view.dart';
 import 'package:flightbooking/app/resources/apiKeys.dart';
 import 'package:flightbooking/app/routes/app_pages.dart';
 import 'package:flightbooking/app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+
+import '../../modules/flight/addPassenger/views/add_passenger_view.dart';
 
 class FlightsRepository {
   //Feteching airports
@@ -70,6 +74,7 @@ class FlightsRepository {
       if (response.statusCode == 200) {
         EasyLoading.dismiss();
         Map<String, dynamic> data = await json.decode(response.body);
+        print(data);
 
         return GetSessionId.fromJson(data);
       } else {
@@ -100,6 +105,7 @@ class FlightsRepository {
       // Parse the JSON response
 
       var data = json.decode(response.body);
+      print(data);
       Get.toNamed(Routes.SEARCH_FLIGHT_RESULTS, arguments: [data, tripType]);
 
       return data;
@@ -162,18 +168,133 @@ class FlightsRepository {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        // Request was successful, handle the response data here
         var data = jsonDecode(response.body);
         return GetRulesModel.fromJson(data);
       } else {
-        // Request was unsuccessful, handle error
         print('Failed to load data: ${response.statusCode}');
         throw Exception();
       }
     } catch (e) {
-      // An error occurred while fetching data
       print('Error: $e');
       throw Exception();
+    }
+  }
+
+  Future<void> createBookingRequest() async {
+    const String url =
+        "https://marketplace.beta.luxota.network/v1/book/flight/create";
+
+    final storage = GetStorage();
+    String? referenceId = storage.read('referenceId');
+
+    if (referenceId == null || referenceId.isEmpty) {
+      print("Error: referenceId is null or empty.");
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'referenceId': referenceId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        String bookingReferenceId = data['bookingReferenceId'];
+
+        print("Success: $data");
+
+        print(" BookingId   $bookingReferenceId");
+        final storage = GetStorage();
+        storage.write('bookingReferenceId', bookingReferenceId);
+        print('storedBookingId is ${storage.read('bookingReferenceId')}');
+      } else {
+        final errorData = jsonDecode(response.body);
+        print("${errorData['referenceId'] ?? response.body}");
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Exception occurred: $e");
+    }
+  }
+
+  Future<void> fetchBookingInformation(String bookingId) async {
+    final String url =
+        'https://marketplace.beta.luxota.network/v1/book/$bookingId/bookingInformation';
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        Map<String, dynamic> dataMap = data;
+        Get.to(() => DynamicForm(
+              formData: dataMap,
+            ));
+        // final storage = GetStorage();
+        // storage.write('dataForDynamicForm', dataMap);
+
+        print('Response Data: $data');
+        // print(
+        //     'Dynamin form stored data is ${storage.read('dataForDynamicForm')}');
+      } else {
+        print(
+            'Failed to load booking information. Status code: ${response.statusCode}');
+        print('Error: ${response.body}');
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+    }
+  }
+
+  //passengerInfo api
+
+  Future<void> bookGuest() async {
+    const String url = "https://marketplace.beta.luxota.network/v1/book/guests";
+
+    var requestBody = {
+      "referenceId": "1ber4sdc91pk1lzguv37r44675141088b34f",
+      "passengers[adults][0][Gender]": "male",
+      "passengers[adults][0][First_name]": "John",
+      "passengers[adults][0][Last_name]": "Doe",
+      "passengers[adults][0][email]": "a@gmail.com",
+      "passengers[adults][0][Phone][phone]": "36589632",
+      "passengers[adults][0][Phone][countryPhoneCode]": "98",
+      "passengers[adults][0][Nationality]": "104",
+      "passengers[adults][0][Passport Expiry Date]": "2026-09-20",
+      "passengers[adults][0][Date of birth]": "2000-02-20",
+      "passengers[adults][0][Passport Number]": "A123456789",
+    };
+
+    try {
+      // Make the POST request
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          // "Authorization": "Bearer $token",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: requestBody,
+      );
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        print("Booking successful: ${response.body}");
+      } else {
+        print("Failed to book guest. Status code: ${response.statusCode}");
+        print("Error response: ${response.body}");
+      }
+    } catch (e) {
+      print("An error occurred: $e");
     }
   }
 }

@@ -1,7 +1,10 @@
 import 'package:get/get.dart';
-
+import '../modules/Event/bindings/event_binding.dart';
+import '../modules/Event/views/event_view.dart';
 import '../modules/Package/bindings/package_binding.dart';
 import '../modules/Package/views/package_view.dart';
+import '../modules/Tour/bindings/tour_binding.dart';
+import '../modules/Tour/views/tour_view.dart';
 import '../modules/Visa/bindings/visa_binding.dart';
 import '../modules/Visa/views/visa_view.dart';
 import '../modules/authentication/forgotPassword/bindings/forgot_password_binding.dart';
@@ -109,12 +112,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.FLIGHT_DETAILS,
-      page: () => const FlightDetailsView(),
+      page: () => FlightDetailsView(),
       binding: FlightDetailsBinding(),
     ),
     GetPage(
       name: _Paths.ADD_PASSENGER,
-      page: () => const AddPassengerView(),
+      page: () => AddPassengerView(),
       binding: AddPassengerBinding(),
     ),
     GetPage(
@@ -176,6 +179,16 @@ class AppPages {
       name: _Paths.VISA,
       page: () => const VisaView(),
       binding: VisaBinding(),
+    ),
+    GetPage(
+      name: _Paths.TOUR,
+      page: () => const TourView(),
+      binding: TourBinding(),
+    ),
+    GetPage(
+      name: _Paths.EVENT,
+      page: () => const EventView(),
+      binding: EventBinding(),
     ),
   ];
 }
