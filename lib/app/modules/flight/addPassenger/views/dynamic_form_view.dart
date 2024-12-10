@@ -1,142 +1,191 @@
 import 'package:flightbooking/app/modules/flight/addPassenger/controllers/dynamic_form_controller.dart';
+import 'package:flightbooking/app/modules/flight/searchFlight/controllers/search_flight_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DynamicForm extends GetView<DynamicFormController> {
-  // Make controller optional
-  final Map<String, dynamic> formData;
+class DynamicForm extends StatelessWidget {
+  final Map<String, dynamic> formData; // Fields from the API response
 
-  // Constructor without the 'required' keyword for the controller
-  const DynamicForm({required this.formData, Key? key}) : super(key: key);
+  DynamicForm({Key? key, required this.formData}) : super(key: key);
+
+  var selectedDates =
+      <int, Map<String, String>>{}.obs; // Stores date selections
+  var selectedCountries = <int, String>{}.obs;
+  //final SearchFlightController controller = Get.put(SearchFlightController());
 
   @override
   Widget build(BuildContext context) {
-    // Extract and cast 'lead' and 'all' sections from the API response
-    final Map<String, dynamic> lead =
-        Map<String, dynamic>.from(formData['data']['passsengersForm']['lead']);
-    final Map<String, dynamic> all =
-        Map<String, dynamic>.from(formData['data']['passsengersForm']['all']);
-
-    // Combine 'lead' and 'all' sections
-    final combinedSections = {
-      ...lead,
-      ...all,
-    };
-
+    final flightSearchController = Get.put(SearchFlightController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Dynamic Form"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          child: ListView(
-            children: combinedSections.entries.map<Widget>((entry) {
-              final fieldKey = entry.key;
-              final fieldData = entry.value[0]; // Access the field definition
-              return _buildFormField(context, fieldKey, fieldData);
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper method to build form fields based on their type
-  Widget _buildFormField(
-      BuildContext context, String fieldKey, Map<String, dynamic> fieldData) {
-    final fieldType = fieldData['type'];
-    final caption = fieldData['caption'] ?? '';
-    final items = fieldData['items'];
-    final isOptional = fieldData['optional'] ?? false;
-
-    switch (fieldType) {
-      case 'text':
-        return _buildTextField(caption, isOptional);
-      case 'email':
-        return _buildTextField(caption, isOptional,
-            inputType: TextInputType.emailAddress);
-      case 'phone':
-        return _buildTextField(caption, isOptional,
-            inputType: TextInputType.phone);
-      case 'select':
-        return _buildDropdownField(caption, items);
-      case 'birthdate':
-      case 'expirydate':
-        return _buildDatePickerField(context, caption, fieldKey);
-      default:
-        return const SizedBox.shrink(); // Empty space for unsupported types
-    }
-  }
-
-  Widget _buildTextField(String caption, bool isOptional,
-      {TextInputType inputType = TextInputType.text}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        controller: controller?.textEditingControllers[caption],
-        keyboardType: inputType,
-        decoration: InputDecoration(
-          labelText: caption,
-          border: const OutlineInputBorder(),
-          suffixText: isOptional ? "(Optional)" : null,
-        ),
-        validator: isOptional
-            ? null
-            : (value) {
-                if (value == null || value.isEmpty) {
-                  return "$caption is required";
-                }
-                return null;
-              },
-      ),
-    );
-  }
-
-  Widget _buildDropdownField(String caption, Map<String, dynamic>? items) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: caption,
-          border: const OutlineInputBorder(),
-        ),
-        items: items?.entries.map<DropdownMenuItem<String>>((entry) {
-          return DropdownMenuItem(
-            value: entry.key,
-            child: Text(entry.value),
+      appBar: AppBar(title: Text('Passenger Forms')),
+      body: ListView.builder(
+        itemCount: flightSearchController.selectedTravelers.value,
+        itemBuilder: (context, index) {
+          return Card(
+            margin: EdgeInsets.all(10),
+            child: Padding(
+              padding: EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Passenger ${index + 1}',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  // Generate form fields for 'lead' section
+                  ..._generateFormFields(context, index, 'lead'),
+                  Divider(),
+                  // Generate form fields for 'all' section
+                  ..._generateFormFields(context, index, 'all'),
+                ],
+              ),
+            ),
           );
-        }).toList(),
-        onChanged: (value) {},
-      ),
-    );
-  }
-
-  Widget _buildDatePickerField(
-      BuildContext context, String caption, String fieldKey) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: GestureDetector(
-        onTap: () async {
-          final selectedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(1900),
-            lastDate: DateTime(2100),
-          );
-          if (selectedDate != null && controller != null) {
-            controller!.setDateValue(fieldKey, selectedDate);
-          }
         },
-        child: TextFormField(
-          controller: controller?.textEditingControllers[fieldKey],
-          readOnly: true, // Make the field read-only to prevent manual input
-          decoration: InputDecoration(
-            labelText: caption,
-            border: const OutlineInputBorder(),
-          ),
-        ),
       ),
     );
+  }
+
+  List<Widget> _generateFormFields(
+      BuildContext context, int passengerIndex, String section) {
+    List<Widget> formWidgets = [];
+
+    // Get fields from the specified section ('lead' or 'all')
+    Map<String, dynamic> passengerFields =
+        formData['data']['passsengersForm'][section];
+
+    passengerFields.forEach((fieldName, fieldData) {
+      String fieldType = fieldData[0]['type'];
+      String fieldCaption = fieldData[0]['caption'];
+      bool isOptional = fieldData[0]['optional'] ?? false;
+
+      switch (fieldType) {
+        case 'text':
+          formWidgets.add(
+            TextField(
+              decoration: InputDecoration(
+                labelText: fieldCaption,
+                hintText: 'Enter your $fieldCaption',
+              ),
+            ),
+          );
+          break;
+
+        case 'email':
+          formWidgets.add(
+            TextField(
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: fieldCaption,
+                hintText: 'Enter your $fieldCaption',
+              ),
+            ),
+          );
+          break;
+
+        case 'phone':
+          formWidgets.add(
+            TextField(
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: fieldCaption,
+                hintText: 'Enter your $fieldCaption',
+              ),
+            ),
+          );
+          break;
+
+        case 'select':
+          Map<String, String> items =
+              Map<String, String>.from(fieldData[0]['items']);
+          formWidgets.add(
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(labelText: fieldCaption),
+              items: items.entries.map((entry) {
+                return DropdownMenuItem<String>(
+                  value: entry.key,
+                  child: Text(entry.value),
+                );
+              }).toList(),
+              onChanged: (value) {},
+            ),
+          );
+          break;
+
+        case 'birthdate':
+        case 'expirydate':
+          formWidgets.add(
+            Obx(() {
+              String selectedDate = selectedDates[passengerIndex]?[fieldName] ??
+                  'Select your $fieldCaption';
+              return GestureDetector(
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2050),
+                  );
+                  if (pickedDate != null) {
+                    // Store the selected date in the controller
+                    selectedDates[passengerIndex] ??= {};
+                    selectedDates[passengerIndex]![fieldName] =
+                        "${pickedDate.toLocal()}".split(' ')[0];
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: fieldCaption,
+                      hintText: selectedDate,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          );
+          break;
+
+        case 'CountryCode':
+          Map<String, String> items =
+              Map<String, String>.from(fieldData[0]['items'] ?? {});
+          formWidgets.add(
+            Obx(() {
+              String selectedCountry = selectedCountries[passengerIndex] ??
+                  'Select your $fieldCaption';
+              return DropdownButtonFormField<String>(
+                decoration: InputDecoration(labelText: fieldCaption),
+                value: selectedCountry == 'Select your $fieldCaption'
+                    ? null
+                    : selectedCountry,
+                items: items.entries.map((entry) {
+                  return DropdownMenuItem<String>(
+                    value: entry.key,
+                    child: Text(entry.value),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    selectedCountries[passengerIndex] = value;
+                  }
+                },
+              );
+            }),
+          );
+          break;
+
+        default:
+          formWidgets.add(
+            Text('Field type $fieldType not implemented for $fieldCaption'),
+          );
+          break;
+      }
+
+      // Add spacing between fields
+      formWidgets.add(SizedBox(height: 10));
+    });
+
+    return formWidgets;
   }
 }

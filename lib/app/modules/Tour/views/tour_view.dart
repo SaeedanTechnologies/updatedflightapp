@@ -3,7 +3,6 @@ import 'package:flightbooking/app/models/getResponseModel/hotels/getCityModel.da
 
 import 'package:flightbooking/app/models/getResponseModel/hotels/getCountryModel.dart';
 import 'package:flightbooking/app/modules/Tour/controllers/tour_controller.dart';
-import 'package:flightbooking/app/modules/Visa/controllers/visa_controller.dart';
 import 'package:flightbooking/app/repositories/hotelsRepo/searchHotelsRepo.dart';
 import 'package:flightbooking/app/resources/colors.dart';
 import 'package:flightbooking/app/resources/icons.dart';

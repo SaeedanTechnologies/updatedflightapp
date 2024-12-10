@@ -13,8 +13,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
-import '../../modules/flight/addPassenger/views/add_passenger_view.dart';
-
 class FlightsRepository {
   //Feteching airports
   Future<GetAirports> fetchAirports(String query) async {
@@ -237,8 +235,11 @@ class FlightsRepository {
         final data = jsonDecode(response.body);
 
         Map<String, dynamic> dataMap = data;
+        //List dataList = data;
+
         Get.to(() => DynamicForm(
               formData: dataMap,
+              // formsData: [dataList],
             ));
         // final storage = GetStorage();
         // storage.write('dataForDynamicForm', dataMap);

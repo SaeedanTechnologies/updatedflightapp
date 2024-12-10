@@ -1,3 +1,4 @@
+import 'package:flightbooking/app/modules/flight/addPassenger/controllers/dynamic_form_controller.dart';
 import 'package:get/get.dart';
 
 import '../controllers/add_passenger_controller.dart';
@@ -8,5 +9,10 @@ class AddPassengerBinding extends Bindings {
     Get.lazyPut<AddPassengerController>(
       () => AddPassengerController(),
     );
+
+    // Get.lazyPut<DynamicFormController>(
+    //   () => DynamicFormController(),
+
+    // );
   }
 }

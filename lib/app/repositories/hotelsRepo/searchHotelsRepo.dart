@@ -5,11 +5,9 @@ import 'package:flightbooking/app/models/getResponseModel/hotels/getCountryModel
 import 'package:flightbooking/app/models/getResponseModel/sessions/getSessionId.dart';
 import 'package:flightbooking/app/repositories/configsRepo/configsRepo.dart';
 import 'package:flightbooking/app/resources/apiKeys.dart';
-import 'package:flightbooking/app/routes/app_pages.dart';
 import 'package:flightbooking/app/utils/utils.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+
 import 'package:http/http.dart' as http;
 
 class HotelsRepository {
