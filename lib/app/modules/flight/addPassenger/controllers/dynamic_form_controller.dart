@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flightbooking/app/storage/keys.dart';
 import 'package:flightbooking/app/storage/storage.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +53,7 @@ class DynamicFormController extends GetxController {
           'select',
           'text',
           'birthdate',
-          'CountryCode,',
+          //'CountryCode,',
           'expirydate',
           'email',
           'phone'
@@ -90,9 +88,9 @@ class DynamicFormController extends GetxController {
       });
 
       // Collect country code
-      if (selectedCountries.containsKey(i)) {
-        passengerData['countryCode'] = selectedCountries[i];
-      }
+      // if (selectedCountries.containsKey(i)) {
+      //   passengerData['countryCode'] = selectedCountries[i];
+      // }
 
       passengers.add(passengerData);
     }
@@ -107,74 +105,92 @@ class DynamicFormController extends GetxController {
   // Submit data to API
 
   Future<void> submitFormData(int passengerCount) async {
-    try {
-      final storage = GetStorage();
-      String? bookingReferenceId = storage.read('bookingReferenceId');
+    //try {
+    final storage = GetStorage();
+    String? bookingReferenceId = storage.read('bookingReferenceId');
 
-      // Validate referenceId
-      if (bookingReferenceId == null || bookingReferenceId.isEmpty) {
-        Get.snackbar('Error', 'Booking Reference ID is missing');
-        return;
-      }
-      print("refBookingId is :$bookingReferenceId");
-      // Collect data
-      Map<String, dynamic> apiPayload = collectFormData(passengerCount);
-      print('apiPayload is : $apiPayload');
+    // Validate referenceId
+    if (bookingReferenceId == null || bookingReferenceId.isEmpty) {
+      Get.snackbar('Error', 'Booking Reference ID is missing');
+      return;
+    }
+    print("refBookingId is :$bookingReferenceId");
+    // Collect data
+    Map<String, dynamic> apiPayload = collectFormData(passengerCount);
+    print('apiPayload is : $apiPayload');
 
-      // Transform apiPayload to match the API's required form-data structure
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('https://marketplace.beta.luxota.network/v1/book/guests'),
-      );
+    // Transform apiPayload to match the API's required form-data structure
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('https://marketplace.beta.luxota.network/v1/book/guests'),
+    );
 
-      // Add headers
-      request.headers.addAll({
-        'Authorization': 'Bearer ${StorageServices.to.getString(usertoken)}',
-      });
+    // Add headers
+    request.headers.addAll({
+      'Authorization': 'Bearer ${StorageServices.to.getString(usertoken)}',
+    });
 
-      // Add referenceId to request fields
-      request.fields['referenceId'] = bookingReferenceId;
+    // Add referenceId to request fields
+    request.fields['referenceId'] = bookingReferenceId;
 
-      // Flatten and add passenger data to the request
-      Map<String, dynamic> passengers = apiPayload['passengers'];
-      List<dynamic> adults = passengers['adults'];
+    // Flatten and add passenger data to the request
+    Map<String, dynamic> passengers = apiPayload['passengers'];
+    List<dynamic> adults = passengers['adults'];
 
-      for (int i = 0; i < adults.length; i++) {
-        var adult = adults[i];
-        print('Adults $adult');
-        request.fields['passengers[adults][$i][First_name]'] =
-            adult['first_name'];
-        request.fields['passengers[adults][$i][Last_name]'] =
-            adult['last_name'];
-        request.fields['passengers[adults][$i][email]'] = adult['email'];
-        request.fields['passengers[adults][$i][phone]'] = adult['phone'];
-        request.fields['passengers[adults][$i][gender]'] = adult['gender'];
-        request.fields['passengers[adults][$i][Date of birth]'] =
-            adult['birthdate'];
-        request.fields['passengers[adults][$i][Passport Expiry Date]'] =
-            adult['passport_expiry'];
-        request.fields['passengers[adults][$i][Passport Number]'] =
-            adult['passport_number'];
-      }
+    for (int i = 0; i < adults.length; i++) {
+      var adult = adults[i];
+      print('Adults $adult');
+      request.fields['passengers[adults][$i][First_name]'] =
+          adult['first_name'];
+      request.fields['passengers[adults][$i][Last_name]'] = adult['last_name'];
+      request.fields['passengers[adults][$i][Email]'] = adult['email'];
+      request.fields['passengers[adults][$i][Phone][phone]'] = adult['phone'];
 
-      // Send request
-      var response = await request.send();
+      request.fields['passengers[adults][$i][Phone][countryPhoneCode]'] = '92';
+      //     adult["countryPhoneCode"];
 
-      if (response.statusCode == 200) {
-        final responseData =
-            await response.stream.bytesToString(); // Decode response
-        print('API Response Data: $responseData');
-        Get.snackbar('Success', 'Forms submitted successfully!');
-      } else {
-        print(
-            'Error: ${response.statusCode}, ${await response.stream.bytesToString()}');
-        Get.snackbar('Error', 'Failed to submit forms');
-      }
-    } catch (e) {
-      print('Exception: $e');
-      Get.snackbar('Error', 'An error occurred while submitting the forms');
+      request.fields['passengers[adults][$i][Gender]'] = adult['gender'];
+      request.fields['passengers[adults][$i][Nationality]'] = '104';
+
+      // request.fields['passengers[adults][$i][Date of birth]'] = '2000-02-20';
+      // request.fields['passengers[adults][$i][Passport Expiry Date]'] =
+      //     '2026-09-20';
+      request.fields['passengers[adults][$i][Date of birth]'] =
+          adult['birthdate'];
+      print('date Date of Birth: ${adult['birthdate']}');
+      request.fields['passengers[adults][$i][Passport Expiry Date]'] =
+          adult['passport_expiry'];
+      print('expiryee date is ::${adult['passport_expiry']} ');
+      // adult['passport_expiry'] ??
+      //'1900-01-01'; // Default to a fallback date
+      print('Passport Expiryee: ${adult['passport_expiry'] ?? '1900-01-01'}');
+
+      request.fields['passengers[adults][$i][Passport Number]'] =
+          adult['passport_number'];
+      print('fields ${request.fields}');
+    }
+
+    // Send request
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData =
+          await response.stream.bytesToString(); // Decode response
+      print('API Response Data: $responseData');
+      Get.snackbar('Success', 'Forms submitted successfully!');
+      print('Formated Date print:: ');
+    } else {
+      print(
+          'Error: ${response.statusCode}, ${await response.stream.bytesToString()}');
+      Get.snackbar('Error', 'Failed to submit forms');
     }
   }
+  //  catch (e) {
+
+  //   print('Exception: $e');
+  //   Get.snackbar('Error', 'An error occurred while submitting the forms');
+  // }
+}
 
   // Future<void> submitFormData(int passengerCount) async {
   //   try {
@@ -235,4 +251,4 @@ class DynamicFormController extends GetxController {
   //     Get.snackbar('Error', 'An error occurred while submitting the forms');
   //   }
   // }
-}
+//}

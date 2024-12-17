@@ -1,6 +1,8 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flightbooking/app/commonWidgtes/commonTextField.dart';
 import 'package:flightbooking/app/commonWidgtes/customelevatedButton.dart';
+import 'package:flightbooking/app/modules/flight/addPassenger/views/dynamic_form_view.dart';
+import 'package:flightbooking/app/modules/flight/addPassenger/views/test.dart';
 import 'package:flightbooking/app/modules/flight/searchFlight/controllers/search_flight_controller.dart';
 import 'package:flightbooking/app/repositories/flightsRepo/flightsRepo.dart';
 import 'package:flightbooking/app/resources/alignments.dart';
@@ -429,6 +431,8 @@ class AddPassengerView extends GetView<AddPassengerController> {
                   onPressed: () {
                     flightsRepository
                         .fetchBookingInformation(controller.bookingId.value);
+
+                    // Get.to(DynamicFormScreen());
 
                     // showModalBottomSheet(
                     //   context: context,
