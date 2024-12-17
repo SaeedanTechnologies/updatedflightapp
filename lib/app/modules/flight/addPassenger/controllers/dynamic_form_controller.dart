@@ -26,6 +26,7 @@ class DynamicFormController extends GetxController {
       textControllers[i] ??= {};
       selectedValues[i] ??= {};
       selectedDates[i] ??= {};
+      selectedCountries[i] ??= {}.toString();
 
       Map<String, dynamic> passengerFieldsLead =
           formData['data']['passsengersForm']['lead'];
@@ -53,7 +54,7 @@ class DynamicFormController extends GetxController {
           'select',
           'text',
           'birthdate',
-          //'CountryCode,',
+          'CountryCode,',
           'expirydate',
           'email',
           'phone'
@@ -80,19 +81,23 @@ class DynamicFormController extends GetxController {
       // Collect dropdowns
       selectedValues[i]?.forEach((fieldName, selectedValue) {
         passengerData[fieldName] = selectedValue;
+        print('passengerdattt $fieldName');
       });
 
       // Collect date pickers
       selectedDates[i]?.forEach((fieldName, selectedDate) {
         passengerData[fieldName] = selectedDate;
+        print('passengerdat_dates $fieldName');
       });
 
       // Collect country code
-      // if (selectedCountries.containsKey(i)) {
-      //   passengerData['countryCode'] = selectedCountries[i];
-      // }
+      if (selectedCountries.containsKey(i)) {
+        passengerData['CountryCode'] = selectedCountries[i];
+        print('passengerdatfggggggggg ${passengerData['CountryCode']}');
+      }
 
       passengers.add(passengerData);
+      print('Passenger Data is ::  $passengerData');
     }
     final storage = GetStorage();
     String? bookingReferenceId = storage.read('bookingReferenceId');
@@ -139,7 +144,7 @@ class DynamicFormController extends GetxController {
 
     for (int i = 0; i < adults.length; i++) {
       var adult = adults[i];
-      print('Adults $adult');
+      print('Adultsssss $adult');
       request.fields['passengers[adults][$i][First_name]'] =
           adult['first_name'];
       request.fields['passengers[adults][$i][Last_name]'] = adult['last_name'];
@@ -150,19 +155,18 @@ class DynamicFormController extends GetxController {
       //     adult["countryPhoneCode"];
 
       request.fields['passengers[adults][$i][Gender]'] = adult['gender'];
-      request.fields['passengers[adults][$i][Nationality]'] = '104';
+      request.fields['passengers[adults][$i][Nationality]'] =
+          adult['CountryCode'];
+      //1bfsd3i3pufspeer7evhud14676147daa9b4c,
+      print('Nationality is type::${adult['CountryCode']} ');
 
-      // request.fields['passengers[adults][$i][Date of birth]'] = '2000-02-20';
-      // request.fields['passengers[adults][$i][Passport Expiry Date]'] =
-      //     '2026-09-20';
       request.fields['passengers[adults][$i][Date of birth]'] =
           adult['birthdate'];
       print('date Date of Birth: ${adult['birthdate']}');
       request.fields['passengers[adults][$i][Passport Expiry Date]'] =
           adult['passport_expiry'];
       print('expiryee date is ::${adult['passport_expiry']} ');
-      // adult['passport_expiry'] ??
-      //'1900-01-01'; // Default to a fallback date
+
       print('Passport Expiryee: ${adult['passport_expiry'] ?? '1900-01-01'}');
 
       request.fields['passengers[adults][$i][Passport Number]'] =

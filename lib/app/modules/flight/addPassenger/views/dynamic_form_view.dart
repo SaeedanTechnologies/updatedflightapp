@@ -232,6 +232,24 @@ class DynamicForm extends StatelessWidget {
             ),
           );
           break;
+        case 'countryPhoneCode':
+          formWidgets.add(
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(labelText: fieldCaption),
+              items: _getCountryPhoneCodeItems(),
+              // items.entries.map((entry) {
+              //   return DropdownMenuItem<String>(
+              //     value: entry.key,
+              //     child: Text(entry.value),
+              //   );
+              // }).toList(),
+              onChanged: (value) {
+                dynamicFormController.selectedCountries[passengerIndex] =
+                    value!;
+              },
+            ),
+          );
+          break;
 
         case 'select':
           Map<String, String> items =
@@ -296,17 +314,18 @@ class DynamicForm extends StatelessWidget {
           break;
 
         case 'CountryCode':
-          Map<String, String> items =
-              Map<String, String>.from(fieldData[0]['items'] ?? {});
+          // Map<String, String> items =
+          //     Map<String, String>.from(fieldData[0]['items'] ?? {});
           formWidgets.add(
             DropdownButtonFormField<String>(
               decoration: InputDecoration(labelText: fieldCaption),
-              items: items.entries.map((entry) {
-                return DropdownMenuItem<String>(
-                  value: entry.key,
-                  child: Text(entry.value),
-                );
-              }).toList(),
+              items: _getCountryCodeItems(),
+              // items.entries.map((entry) {
+              //   return DropdownMenuItem<String>(
+              //     value: entry.key,
+              //     child: Text(entry.value),
+              //   );
+              // }).toList(),
               onChanged: (value) {
                 dynamicFormController.selectedCountries[passengerIndex] =
                     value!;
@@ -320,34 +339,52 @@ class DynamicForm extends StatelessWidget {
     });
 
     // // Add the "Country Code" field (required for every form)
-    // formWidgets.add(
-    //   DropdownButtonFormField<String>(
-    //     decoration: const InputDecoration(labelText: "Country Code"),
-    //     items:
-    //         _getCountryCodeItems(), // Define this method to provide country codes
-    //     onChanged: (value) {
-    //       dynamicFormController.selectedCountries[passengerIndex] = value!;
-    //     },
-    //   ),
-    // );
-    // formWidgets.add(const SizedBox(height: 10));
+    formWidgets.add(
+      DropdownButtonFormField<String>(
+        decoration: const InputDecoration(labelText: "Country Code"),
+        items:
+            _getCountryCodeItems(), // Define this method to provide country codes
+        onChanged: (value) {
+          dynamicFormController.selectedCountries[passengerIndex] = value!;
+        },
+      ),
+    );
+    formWidgets.add(const SizedBox(height: 10));
 
     return formWidgets;
   }
 
-  // List<DropdownMenuItem<String>> _getCountryCodeItems() {
-  //   Map<String, String> countryCodes = {
-  //     '+1': 'United States',
-  //     '+44': 'United Kingdom',
-  //     '+91': 'India',
-  //     // Add more country codes as needed
-  //   };
+  List<DropdownMenuItem<String>> _getCountryCodeItems() {
+    Map<String, String> countryCodes = {
+      '+92': 'Pakistan',
+      '+91': 'India',
+      '+93': 'Afghanistan',
+      '+1': 'United States',
+      '+44': 'United Kingdom',
+    };
 
-  //   return countryCodes.entries.map((entry) {
-  //     return DropdownMenuItem<String>(
-  //       value: entry.key,
-  //       child: Text("${entry.value} (${entry.key})"),
-  //     );
-  //   }).toList();
-  // }
+    return countryCodes.entries.map((entry) {
+      return DropdownMenuItem<String>(
+        value: entry.key,
+        child: Text("${entry.value} (${entry.key})"),
+      );
+    }).toList();
+  }
+
+  List<DropdownMenuItem<String>> _getCountryPhoneCodeItems() {
+    Map<String, String> countryCodes = {
+      '+97': 'Pakistan',
+      '+118': 'India',
+      '+138': 'Afghanistan',
+      '+18': 'United States',
+      '+41': 'United Kingdom',
+    };
+
+    return countryCodes.entries.map((entry) {
+      return DropdownMenuItem<String>(
+        value: entry.key,
+        child: Text("${entry.value} (${entry.key})"),
+      );
+    }).toList();
+  }
 }
