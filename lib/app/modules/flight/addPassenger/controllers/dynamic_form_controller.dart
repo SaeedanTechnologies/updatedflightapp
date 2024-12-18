@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flightbooking/app/storage/keys.dart';
 import 'package:flightbooking/app/storage/storage.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +10,13 @@ import 'package:http/http.dart' as http;
 class DynamicFormController extends GetxController {
   // Store TextEditingControllers for each field dynamically
   Map<int, Map<String, TextEditingController>> textControllers = {};
+  var selectedCountryCode = ''.obs;
 
   // Store selected values for dropdowns and date pickers
   Map<int, Map<String, String>> selectedValues = {};
 
   // For country code selection
-  Map<int, String> selectedCountries = {};
+  Map<dynamic, dynamic> selectedCountries = {};
 
   // For date selection
   Map<int, Map<String, String>> selectedDates = {};
@@ -22,7 +25,7 @@ class DynamicFormController extends GetxController {
   void initializeControllers(
       int passengerCount, Map<String, dynamic> formData) {
     print('hhhh');
-    for (int i = 0; i < passengerCount; i++) {
+    for (dynamic i = 0; i < passengerCount; i++) {
       textControllers[i] ??= {};
       selectedValues[i] ??= {};
       selectedDates[i] ??= {};
@@ -90,11 +93,19 @@ class DynamicFormController extends GetxController {
         print('passengerdat_dates $fieldName');
       });
 
-      // Collect country code
       if (selectedCountries.containsKey(i)) {
-        passengerData['CountryCode'] = selectedCountries[i];
-        print('passengerdatfggggggggg ${passengerData['CountryCode']}');
+        var countryData = selectedCountries[i];
+        passengerData['CountryCode'] = countryData['id']; // Country ID
+        passengerData['PhoneCode'] = countryData['phone_code']; // Phone Code
+        print('Country code  is :: ${passengerData['CountryCode']}');
+        print(' phoneCode is :: ${passengerData['PhoneCode']}');
       }
+
+      // // Collect country code
+      // if (selectedCountries.containsKey(i)) {
+      //   passengerData['CountryCode'] = selectedCountries[i];
+      //   print('passengerdatfggggggggg ${passengerData['CountryCode']}');
+      // }
 
       passengers.add(passengerData);
       print('Passenger Data is ::  $passengerData');
@@ -150,15 +161,26 @@ class DynamicFormController extends GetxController {
       request.fields['passengers[adults][$i][Last_name]'] = adult['last_name'];
       request.fields['passengers[adults][$i][Email]'] = adult['email'];
       request.fields['passengers[adults][$i][Phone][phone]'] = adult['phone'];
-
-      request.fields['passengers[adults][$i][Phone][countryPhoneCode]'] = '92';
-      //     adult["countryPhoneCode"];
-
       request.fields['passengers[adults][$i][Gender]'] = adult['gender'];
+
+      // request.fields['passengers[adults][$i][Phone][countryPhoneCode]'] = '92';
+      // //adult["countryCode"];
+
+      // request.fields['passengers[adults][$i][Nationality]'] =
+      //     adult['CountryCode'];
+      // //1bfsd3i3pufspeer7evhud14676147daa9b4c,
+      // print('Nationality is type::${adult['CountryCode']} ');
+
+      // Include country phone code and ID
+      request.fields['passengers[adults][$i][Phone][countryPhoneCode]'] =
+          adult['PhoneCode']; // Phone Code
+      print('Phone Code is :: ${adult['PhoneCode']}');
+      // request.fields['passengers[adults][$i][Nationality]'] =
+      //     adult['CountryCode']; // Country ID
       request.fields['passengers[adults][$i][Nationality]'] =
-          adult['CountryCode'];
-      //1bfsd3i3pufspeer7evhud14676147daa9b4c,
-      print('Nationality is type::${adult['CountryCode']} ');
+          adult['CountryCode'] != null ? adult['CountryCode'].toString() : '0';
+
+      print('Country Code is :: ${adult['CountryCode']}');
 
       request.fields['passengers[adults][$i][Date of birth]'] =
           adult['birthdate'];
@@ -194,6 +216,29 @@ class DynamicFormController extends GetxController {
   //   print('Exception: $e');
   //   Get.snackbar('Error', 'An error occurred while submitting the forms');
   // }
+
+  Future<List<Map<String, dynamic>>> fetchCountries() async {
+    final url =
+        Uri.parse('https://marketplace.beta.luxota.network/v1/countries');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as List;
+        return data.map((country) {
+          return {
+            'id': country['id'],
+            'phone_code': country['phone_code'],
+            'title': country['title'],
+          };
+        }).toList();
+      } else {
+        throw Exception('Failed to load countries');
+      }
+    } catch (e) {
+      print('Error fetching countries: $e');
+      return [];
+    }
+  }
 }
 
   // Future<void> submitFormData(int passengerCount) async {
