@@ -68,7 +68,7 @@ class FlightsRepository {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       );
-
+      print(response);
       if (response.statusCode == 200) {
         EasyLoading.dismiss();
         Map<String, dynamic> data = await json.decode(response.body);
@@ -159,8 +159,10 @@ class FlightsRepository {
   }
 
   Future<GetRulesModel> getFlightRules(String flightBufferRID) async {
+    var storage = GetStorage();
+    var referenceId = storage.read('referenceId');
     final String url =
-        'https://marketplace.beta.luxota.network/v1/profile/flight?referenceId=$flightBufferRID';
+        'https://marketplace.beta.luxota.network/v1/profile/flight?referenceId=$referenceId';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -208,6 +210,8 @@ class FlightsRepository {
         final storage = GetStorage();
         storage.write('bookingReferenceId', bookingReferenceId);
         print('storedBookingId is ${storage.read('bookingReferenceId')}');
+
+        fetchBookingInformation(bookingReferenceId);
       } else {
         final errorData = jsonDecode(response.body);
         print("${errorData['referenceId'] ?? response.body}");
@@ -235,18 +239,12 @@ class FlightsRepository {
         final data = jsonDecode(response.body);
 
         Map<String, dynamic> dataMap = data;
-        //List dataList = data;
 
         Get.to(() => DynamicForm(
               formData: dataMap,
-              // formsData: [dataList],
             ));
-        // final storage = GetStorage();
-        // storage.write('dataForDynamicForm', dataMap);
 
         print('Response Data: $data');
-        // print(
-        //     'Dynamin form stored data is ${storage.read('dataForDynamicForm')}');
       } else {
         print(
             'Failed to load booking information. Status code: ${response.statusCode}');

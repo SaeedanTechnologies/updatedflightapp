@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'package:flightbooking/app/modules/flight/PaymentsGatways/PaymentGatWays/views/payment_gat_ways_view.dart';
+import 'package:flightbooking/app/modules/flight/searchFlight/controllers/search_flight_controller.dart';
 import 'package:flightbooking/app/storage/keys.dart';
 import 'package:flightbooking/app/storage/storage.dart';
 import 'package:flutter/material.dart';
@@ -8,51 +9,43 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class DynamicFormController extends GetxController {
-  // Store TextEditingControllers for each field dynamically
+  final flightSearchController = Get.put(SearchFlightController());
+
   Map<int, Map<String, TextEditingController>> textControllers = {};
   var selectedCountryCode = ''.obs;
-
-  // Store selected values for dropdowns and date pickers
   Map<int, Map<String, String>> selectedValues = {};
-
-  // For country code selection
   Map<dynamic, dynamic> selectedCountries = {};
-
-  // For date selection
   Map<int, Map<String, String>> selectedDates = {};
 
-  // Initialize controllers dynamically
-  void initializeControllers(
-      int passengerCount, Map<String, dynamic> formData) {
-    print('hhhh');
-    for (dynamic i = 0; i < passengerCount; i++) {
+  // Initialize controllers dynamically for adults, children, and infants
+  void initializeControllers(int adultsCount, int childrenCount,
+      int infantsCount, Map<String, dynamic> formData) {
+    int totalCount = adultsCount + childrenCount + infantsCount;
+    print('nnn   $infantsCount');
+    print('www    $childrenCount');
+    print('qqq    $adultsCount');
+
+    for (int i = 0; i < totalCount; i++) {
       textControllers[i] ??= {};
       selectedValues[i] ??= {};
       selectedDates[i] ??= {};
-      selectedCountries[i] ??= {}.toString();
+      selectedCountries[i] ??= {};
 
       Map<String, dynamic> passengerFieldsLead =
           formData['data']['passsengersForm']['lead'];
-      print('in $passengerFieldsLead');
       passengerFieldsLead.forEach((fieldName, fieldData) {
-        print('in foreach ${fieldName}${fieldData}');
-
         String fieldType = fieldData[0]['type'];
-        print('in fieldType ${fieldType}${fieldData[0]}');
         if (['text', 'email', 'phone'].contains(fieldType)) {
-          print('initializeControllers ${fieldName}');
           textControllers[i]![fieldName] = TextEditingController();
         }
       });
 
-      Map<String, dynamic> passengerFields =
+      Map<String, dynamic> passengerFieldsAll =
           formData['data']['passsengersForm']['all'];
-      print('in ${passengerFields}');
-      passengerFields.forEach((fieldName, fieldData) {
-        print('in foreach ${fieldName}${fieldData}');
-
+      print('in $passengerFieldsAll');
+      passengerFieldsAll.forEach((fieldName, fieldData) {
         String fieldType = fieldData[0]['type'];
-        print('in fieldType ${fieldType}${fieldData[0]}');
+        print('in fieldTypeeeeeeeeeeeee ${fieldType}${fieldData[0]}');
         if ([
           'select',
           'text',
@@ -62,161 +55,220 @@ class DynamicFormController extends GetxController {
           'email',
           'phone'
         ].contains(fieldType)) {
-          print('initializeControllers $fieldName');
           textControllers[i]![fieldName] = TextEditingController();
         }
       });
     }
   }
 
-  // Collect data from forms
-  Map<String, dynamic> collectFormData(int passengerCount) {
-    List<Map<String, dynamic>> passengers = [];
-    for (int i = 0; i < passengerCount; i++) {
-      Map<String, dynamic> passengerData = {};
+  // Collect data from forms for adults, children, and infants
+  Map<String, dynamic> collectFormData(
+      int adultsCount, int childrenCount, int infantsCount) {
+    List<Map<String, dynamic>> adultsData = [];
+    List<Map<String, dynamic>> childrenData = [];
+    List<Map<String, dynamic>> infantsData = [];
 
-      // Collect text fields
-      textControllers[i]?.forEach((fieldName, controller) {
-        passengerData[fieldName] = controller.text.trim();
-        print('passengerdat $fieldName');
-      });
-
-      // Collect dropdowns
-      selectedValues[i]?.forEach((fieldName, selectedValue) {
-        passengerData[fieldName] = selectedValue;
-        print('passengerdattt $fieldName');
-      });
-
-      // Collect date pickers
-      selectedDates[i]?.forEach((fieldName, selectedDate) {
-        passengerData[fieldName] = selectedDate;
-        print('passengerdat_dates $fieldName');
-      });
-
-      if (selectedCountries.containsKey(i)) {
-        var countryData = selectedCountries[i];
-        passengerData['CountryCode'] = countryData['id']; // Country ID
-        passengerData['PhoneCode'] = countryData['phone_code']; // Phone Code
-        print('Country code  is :: ${passengerData['CountryCode']}');
-        print(' phoneCode is :: ${passengerData['PhoneCode']}');
-      }
-
-      // // Collect country code
-      // if (selectedCountries.containsKey(i)) {
-      //   passengerData['CountryCode'] = selectedCountries[i];
-      //   print('passengerdatfggggggggg ${passengerData['CountryCode']}');
-      // }
-
-      passengers.add(passengerData);
-      print('Passenger Data is ::  $passengerData');
+    for (int i = 0; i < adultsCount; i++) {
+      adultsData.add(_collectPassengerData(i));
+      print("adultsData ${i}");
     }
-    final storage = GetStorage();
-    String? bookingReferenceId = storage.read('bookingReferenceId');
+
+    for (int i = adultsCount; i < adultsCount + childrenCount; i++) {
+      childrenData.add(_collectPassengerData(i));
+      print("childrenData ${i}");
+    }
+    print(' check $infantsCount');
+    for (int i = adultsCount + childrenCount;
+        i < adultsCount + childrenCount + infantsCount;
+        i++) {
+      infantsData.add(_collectPassengerData(i));
+      print('total infants  $infantsCount');
+      print("infantsData ${i}....${infantsCount}");
+    }
+    print('adultsData is::: $adultsData');
+    print('ChildrenData is::: $childrenData');
+    print('intantsData is::: $infantsData');
+
     return {
-      'referenceId': bookingReferenceId,
-      'passengers': {'adults': passengers}
+      'adults': adultsData,
+      'children': childrenData,
+      'infants': infantsData,
     };
   }
 
-  // Submit data to API
+  // Helper function to collect data for a passenger (adult/child/infant)
+  Map<String, dynamic> _collectPassengerData(int passengerIndex) {
+    Map<String, dynamic> passengerData = {};
 
-  Future<void> submitFormData(int passengerCount) async {
-    //try {
+    textControllers[passengerIndex]?.forEach((fieldName, controller) {
+      passengerData[fieldName] = controller.text.trim();
+    });
+
+    selectedValues[passengerIndex]?.forEach((fieldName, selectedValue) {
+      passengerData[fieldName] = selectedValue;
+    });
+
+    selectedDates[passengerIndex]?.forEach((fieldName, selectedDate) {
+      passengerData[fieldName] = selectedDate;
+    });
+
+    if (selectedCountries.containsKey(passengerIndex)) {
+      var countryData = selectedCountries[passengerIndex];
+      passengerData['CountryCode'] = countryData['id'];
+      passengerData['PhoneCode'] = countryData['phone_code'];
+    }
+    print(
+        ' Passenger Data is :::::index is $passengerIndex and the Data is  $passengerData');
+    return passengerData;
+  }
+
+  // Submit data to the API
+  Future<void> submitFormData(
+      int adultsCount, int childrenCount, int infantsCount) async {
     final storage = GetStorage();
     String? bookingReferenceId = storage.read('bookingReferenceId');
 
-    // Validate referenceId
     if (bookingReferenceId == null || bookingReferenceId.isEmpty) {
       Get.snackbar('Error', 'Booking Reference ID is missing');
       return;
     }
-    print("refBookingId is :$bookingReferenceId");
-    // Collect data
-    Map<String, dynamic> apiPayload = collectFormData(passengerCount);
-    print('apiPayload is : $apiPayload');
 
-    // Transform apiPayload to match the API's required form-data structure
+    Map<String, dynamic> formData =
+        collectFormData(adultsCount, childrenCount, infantsCount);
+    print(
+        ' adults is $adultsCount  children are $childrenCount and infants are $infantsCount');
+
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('https://marketplace.beta.luxota.network/v1/book/guests'),
     );
 
-    // Add headers
     request.headers.addAll({
       'Authorization': 'Bearer ${StorageServices.to.getString(usertoken)}',
     });
 
-    // Add referenceId to request fields
     request.fields['referenceId'] = bookingReferenceId;
+    var adultsFrom = formData['adults'];
 
-    // Flatten and add passenger data to the request
-    Map<String, dynamic> passengers = apiPayload['passengers'];
-    List<dynamic> adults = passengers['adults'];
-
-    for (int i = 0; i < adults.length; i++) {
-      var adult = adults[i];
-      print('Adultsssss $adult');
+    for (int i = 0; i < adultsFrom.length; i++) {
+      var passenger = adultsFrom[i];
       request.fields['passengers[adults][$i][First_name]'] =
-          adult['first_name'];
-      request.fields['passengers[adults][$i][Last_name]'] = adult['last_name'];
-      request.fields['passengers[adults][$i][Email]'] = adult['email'];
-      request.fields['passengers[adults][$i][Phone][phone]'] = adult['phone'];
-      request.fields['passengers[adults][$i][Gender]'] = adult['gender'];
+          passenger['first_name'];
+      request.fields['passengers[adults][$i][Last_name]'] =
+          passenger['last_name'];
+      request.fields['passengers[adults][$i][Email]'] = passenger['email'];
+      request.fields['passengers[adults][$i][Phone][phone]'] =
+          passenger['phone'];
+      request.fields['passengers[adults][$i][Gender]'] = passenger['gender'];
 
-      // request.fields['passengers[adults][$i][Phone][countryPhoneCode]'] = '92';
-      // //adult["countryCode"];
+      if (passenger['PhoneCode'] != null) {
+        request.fields['passengers[adults][$i][Phone][countryPhoneCode]'] =
+            passenger['PhoneCode'];
+      }
 
-      // request.fields['passengers[adults][$i][Nationality]'] =
-      //     adult['CountryCode'];
-      // //1bfsd3i3pufspeer7evhud14676147daa9b4c,
-      // print('Nationality is type::${adult['CountryCode']} ');
-
-      // Include country phone code and ID
-      request.fields['passengers[adults][$i][Phone][countryPhoneCode]'] =
-          adult['PhoneCode']; // Phone Code
-      print('Phone Code is :: ${adult['PhoneCode']}');
-      // request.fields['passengers[adults][$i][Nationality]'] =
-      //     adult['CountryCode']; // Country ID
       request.fields['passengers[adults][$i][Nationality]'] =
-          adult['CountryCode'] != null ? adult['CountryCode'].toString() : '0';
-
-      print('Country Code is :: ${adult['CountryCode']}');
-
+          passenger['CountryCode'].toString() ?? '92';
       request.fields['passengers[adults][$i][Date of birth]'] =
-          adult['birthdate'];
-      print('date Date of Birth: ${adult['birthdate']}');
+          passenger['birthdate'] ?? '1900-01-01';
       request.fields['passengers[adults][$i][Passport Expiry Date]'] =
-          adult['passport_expiry'];
-      print('expiryee date is ::${adult['passport_expiry']} ');
-
-      print('Passport Expiryee: ${adult['passport_expiry'] ?? '1900-01-01'}');
-
+          passenger['passport_expiry'] ?? '1900-01-01';
       request.fields['passengers[adults][$i][Passport Number]'] =
-          adult['passport_number'];
-      print('fields ${request.fields}');
+          passenger['passport_number'];
     }
 
-    // Send request
+    var childrenFrom = formData['children'];
+
+    for (int i = 0; i < childrenFrom.length; i++) {
+      var passenger = childrenFrom[i];
+      request.fields['passengers[children][$i][First_name]'] =
+          passenger['first_name'];
+      request.fields['passengers[children][$i][Last_name]'] =
+          passenger['last_name'];
+      request.fields['passengers[children][$i][Email]'] = passenger['email'];
+      request.fields['passengers[children][$i][Phone][phone]'] =
+          passenger['phone'];
+      request.fields['passengers[children][$i][Gender]'] = passenger['gender'];
+
+      if (passenger['PhoneCode'] != null) {
+        request.fields['passengers[children][$i][Phone][countryPhoneCode]'] =
+            passenger['PhoneCode'];
+      }
+
+      request.fields['passengers[children][$i][Nationality]'] =
+          passenger['CountryCode'].toString() ?? '0';
+      request.fields['passengers[children][$i][Date of birth]'] =
+          passenger['birthdate'] ?? '1900-01-01';
+      request.fields['passengers[children][$i][Passport Expiry Date]'] =
+          passenger['passport_expiry'] ?? '1900-01-01';
+      request.fields['passengers[children][$i][Passport Number]'] =
+          passenger['passport_number'];
+    }
+
+    var infantsFrom = formData['infants'];
+
+    for (int i = 0; i < infantsFrom.length; i++) {
+      var passenger = infantsFrom[i];
+      request.fields['passengers[infants][$i][First_name]'] =
+          passenger['first_name'] ?? 'name';
+      request.fields['passengers[infants][$i][Last_name]'] =
+          passenger['last_name'];
+      request.fields['passengers[infants][$i][Email]'] = passenger['email'];
+      request.fields['passengers[infants][$i][Phone][phone]'] =
+          passenger['phone'];
+      request.fields['passengers[infants][$i][Gender]'] = passenger['gender'];
+
+      if (passenger['PhoneCode'] != null) {
+        request.fields['passengers[infants][$i][Phone][countryPhoneCode]'] =
+            passenger['PhoneCode'];
+      }
+
+      request.fields['passengers[infants][$i][Nationality]'] =
+          passenger['CountryCode'].toString() ?? '0';
+      //  request.fields['passengers[infants][$i][Passport Issu Country]'] =
+      // passenger['CountryCode'].toString() ?? '0';
+      request.fields['passengers[infants][$i][Date of birth]'] =
+          passenger['birthdate'] ?? '1900-01-01';
+      request.fields['passengers[infants][$i][Passport Expiry Date]'] =
+          passenger['passport_expiry'] ?? '1900-01-01';
+      request.fields['passengers[infants][$i][Passport Number]'] =
+          passenger['passport_number'];
+    }
+
     var response = await request.send();
 
     if (response.statusCode == 200) {
-      final responseData =
-          await response.stream.bytesToString(); // Decode response
-      print('API Response Data: $responseData');
+      final responseData = await response.stream.bytesToString();
+
+      // Decode the JSON string into a Dart map
+      final Map<String, dynamic> decodedData = jsonDecode(responseData);
+
+      //final data = jsonDecode(response.body);
+
+      print('API response data is ::: $decodedData');
       Get.snackbar('Success', 'Forms submitted successfully!');
-      print('Formated Date print:: ');
+      Get.to(PaymentGatWaysView());
+
+      var newInvoiceReferenceId = decodedData['invoiceReferenceId'];
+      // Store it in GetStorag
+      storage.write('newInvoiceReferenceId', newInvoiceReferenceId);
+      print('Invoice Reference ID stored: $newInvoiceReferenceId');
+      print('Bearer  ${StorageServices.to.getString('usertoken')}');
     } else {
-      print(
-          'Error: ${response.statusCode}, ${await response.stream.bytesToString()}');
+      final reasonPhrase = response.reasonPhrase ?? 'Unknown reason';
+      final statusCode = response.statusCode;
+
+      // Read the response body for additional error details
+      final errorBody = await response.stream.bytesToString();
+
+      print('Error: Failed to submit forms');
+      print('Status Code: $statusCode');
+      print('Reason Phrase: $reasonPhrase');
+      print('Response Body: $errorBody');
       Get.snackbar('Error', 'Failed to submit forms');
     }
   }
-  //  catch (e) {
 
-  //   print('Exception: $e');
-  //   Get.snackbar('Error', 'An error occurred while submitting the forms');
-  // }
-
+  // Fetch countries (for the country code dropdown)
   Future<List<Map<String, dynamic>>> fetchCountries() async {
     final url =
         Uri.parse('https://marketplace.beta.luxota.network/v1/countries');
@@ -240,64 +292,3 @@ class DynamicFormController extends GetxController {
     }
   }
 }
-
-  // Future<void> submitFormData(int passengerCount) async {
-  //   try {
-  //     final storage = GetStorage();
-  //     String? referenceId = storage.read('bookingReferenceId');
-  //     // Collect data
-  //     Map<String, dynamic> apiPayload = collectFormData(passengerCount);
-  //     print('apiPayload is : $apiPayload');
-
-  //     // Transform apiPayload to match the API's required form-data structure
-  //     var request = http.MultipartRequest(
-  //       'POST',
-  //       Uri.parse('https://marketplace.beta.luxota.network/v1/book/guests'),
-  //     );
-
-  //     request.headers.addAll({
-  //       'Authorization': 'Bearer ${StorageServices.to.getString(usertoken)}',
-  //     });
-  //     request.fields['referenceId'] =
-  //         referenceId!; //but here im getting this id not from form's fields im getting it from GetStorage so how can i pass that id in the api as ID is required
-  //     // Flatten and add data to the request
-  //     Map<String, dynamic> passengers = apiPayload['passengers'];
-  //     List<dynamic> adults = passengers['adults'];
-
-  //     for (int i = 0; i < adults.length; i++) {
-  //       var adult = adults[i];
-  //       request.fields['passengers[adults][$i][First_name]'] =
-  //           adult['first_name'];
-  //       request.fields['passengers[adults][$i][Last_name]'] =
-  //           adult['last_name'];
-  //       request.fields['passengers[adults][$i][email]'] = adult['email'];
-  //       request.fields['passengers[adults][$i][phone]'] = adult['phone'];
-  //       request.fields['passengers[adults][$i][gender]'] = adult['gender'];
-  //       request.fields['passengers[adults][$i][Date of birth]'] =
-  //           adult['birthdate'];
-  //       request.fields['passengers[adults][$i][Passport Expiry Date]'] =
-  //           adult['passport_expiry'];
-  //       request.fields['passengers[adults][$i][Passport Number]'] =
-  //           adult['passport_number'];
-  //       // Add other fields as needed
-  //     }
-
-  //     // Send request
-  //     var response = await request.send();
-
-  //     if (response.statusCode == 200) {
-  //       final responseData =
-  //           await response.stream.bytesToString(); // Decode response
-  //       print('API Response Data: $responseData');
-  //       Get.snackbar('Success', 'Forms submitted successfully!');
-  //     } else {
-  //       print(
-  //           'Error: ${response.statusCode}, ${await response.stream.bytesToString()}');
-  //       Get.snackbar('Error', 'Failed to submit forms');
-  //     }
-  //   } catch (e) {
-  //     print('Exception: $e');
-  //     Get.snackbar('Error', 'An error occurred while submitting the forms');
-  //   }
-  // }
-//}

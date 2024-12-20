@@ -15,10 +15,12 @@ class SearchFlightController extends GetxController {
   var selectedAdults = 1.obs;
   var selectedChildren = 0.obs;
   var selectedInfrants = 0.obs;
+
   final RxString selectedClass = RxString('economy');
   final Rx<DateTime?> departureDate = DateTime.now().obs;
   final Rx<DateTime?> returnDate = DateTime.now().obs;
   final RxBool isSelectingClosingDate = false.obs;
+
   Future<void> selectDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
       context: context,
@@ -77,14 +79,18 @@ class SearchFlightController extends GetxController {
         tripType: tripType,
         searchIdentity: data.searcherIdentity);
 
+    final storage = GetStorage();
+    storage.write('selectedInfants', selectedInfrants.value);
+    storage.write('selectedChildrens', selectedChildren.value);
+    storage.write('selectedAdults', selectedAdults.value);
+
     var result = await searchFlightRepository.getsearchFlightsResults(
         sessionId: getSessionId.sessionId!, tripType: tripType);
-    print("refId $result");
+
     var referenceId = result["data"][0]["flightBufferReferenceId"];
-    print(" referenceId $referenceId");
-    final storage = GetStorage();
     storage.write('referenceId', referenceId);
-    print('storedReferenceId is ${storage.read('referenceId')}');
+
+    print(referenceId);
 
     return result;
   }

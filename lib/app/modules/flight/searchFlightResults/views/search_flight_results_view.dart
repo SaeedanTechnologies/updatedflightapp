@@ -792,6 +792,8 @@ class SearchFlightResultsView extends GetView<SearchFlightResultsController> {
                             .outerShadow
                             .make()
                             .onTap(() {
+                          print(
+                              " helooooooooooooooooooooooooo  ${flightsData['data'][index]}");
                           Get.toNamed(Routes.FLIGHT_DETAILS, arguments: [
                             flightsData['data'][index],
                             tripType

@@ -59,7 +59,7 @@ class FlightDetailsView extends GetView<FlightDetailsController> {
                     onPressed: () {
                       flightsRepository.createBookingRequest();
 
-                      Get.toNamed(Routes.ADD_PASSENGER);
+                      //Get.toNamed(Routes.ADD_PASSENGER);
                       // Get.bottomSheet(
                       //   Container(
                       //     padding: const EdgeInsets.all(20),
@@ -1599,6 +1599,8 @@ class FlightDetailsView extends GetView<FlightDetailsController> {
                                           ),
                                           10.heightBox,
                                           Row(
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start, // Aligns items at the top
                                             children: [
                                               Image.asset(
                                                 "assets/icons/laggage.png",
@@ -1606,20 +1608,55 @@ class FlightDetailsView extends GetView<FlightDetailsController> {
                                                 height: 20,
                                               ),
                                               5.widthBox,
-                                              Text(
-                                                flightDetails['serviceInfo']
-                                                        ['legs'][0]['segments']
-                                                    [0]['luggage'],
-                                                style: const TextStyle(
-                                                  color: Color(0xFF808991),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins',
-                                                  fontWeight: FontWeight.w500,
-                                                  height: 0,
+                                              Container(
+                                                constraints: const BoxConstraints(
+                                                    maxWidth:
+                                                        190), // Limit text width
+                                                child: Text(
+                                                  flightDetails['serviceInfo']
+                                                              ['legs'][0]
+                                                          ['segments'][0]
+                                                      ['luggage'],
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF808991),
+                                                    fontSize: 13,
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.w500,
+                                                    height:
+                                                        1.2, // Adjust line spacing
+                                                  ),
+                                                  softWrap:
+                                                      true, // Wraps text when it overflows
+                                                  overflow: TextOverflow
+                                                      .visible, // Ensures it wraps to the next line
                                                 ),
-                                              )
+                                              ),
                                             ],
                                           ),
+
+                                          // Row(
+                                          //   children: [
+                                          //     Image.asset(
+                                          //       "assets/icons/laggage.png",
+                                          //       width: 20,
+                                          //       height: 20,
+                                          //     ),
+                                          //     5.widthBox,
+                                          //     Text(
+                                          //       flightDetails['serviceInfo']
+                                          //                   ['legs'][0]
+                                          //               ['segments'][0]
+                                          //           ['luggage'],
+                                          //       style: const TextStyle(
+                                          //         color: Color(0xFF808991),
+                                          //         fontSize: 13,
+                                          //         fontFamily: 'Poppins',
+                                          //         fontWeight: FontWeight.w500,
+                                          //         height: 0,
+                                          //       ),
+                                          //     )
+                                          //   ],
+                                          // ),
                                           10.heightBox,
                                         ])
                                   ],

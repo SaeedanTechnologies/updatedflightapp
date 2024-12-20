@@ -107,6 +107,7 @@ class AuthRepository {
       // Check the status code of the response
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
+        print(data);
         StorageServices.to.setString(key: usertoken, value: data['token']);
         getUserInformation();
         Get.offAndToNamed(Routes.HOME);

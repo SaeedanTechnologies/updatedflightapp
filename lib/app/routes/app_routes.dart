@@ -36,6 +36,7 @@ abstract class Routes {
   static const TOUR = _Paths.TOUR;
   static const EVENT = _Paths.EVENT;
   static const HOTEL_SEARCH_RESULT = _Paths.HOTEL_SEARCH_RESULT;
+  static const PAYMENT_GAT_WAYS = _Paths.PAYMENT_GAT_WAYS;
 }
 
 abstract class _Paths {
@@ -71,4 +72,5 @@ abstract class _Paths {
   static const TOUR = '/tour';
   static const EVENT = '/event';
   static const HOTEL_SEARCH_RESULT = '/hotel-search-result';
+  static const PAYMENT_GAT_WAYS = '/payment-gat-ways';
 }

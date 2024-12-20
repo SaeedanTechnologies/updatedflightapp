@@ -1,3 +1,4 @@
+import 'package:flightbooking/app/modules/authentication/signin/views/signin_view.dart';
 import 'package:flightbooking/app/resources/alignments.dart';
 import 'package:flightbooking/app/resources/colors.dart';
 import 'package:flightbooking/app/resources/icons.dart';
@@ -5,9 +6,10 @@ import 'package:flightbooking/app/resources/images.dart';
 import 'package:flightbooking/app/resources/paddings.dart';
 import 'package:flightbooking/app/resources/physics.dart';
 import 'package:flightbooking/app/routes/app_pages.dart';
+import 'package:flightbooking/app/storage/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -18,6 +20,31 @@ import '../controllers/home_controller.dart';
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
   @override
+  Future<void> logoutUser(String userToken) async {
+    final String url =
+        'https://marketplace.beta.luxota.network/v1/logout'; // Replace <host> with your API host.
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $userToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Get.to(() => SigninView());
+        print('Logout successful');
+        // Handle success, like navigating to login screen.
+      } else {
+        print('Failed to logout. Status Code: ${response.statusCode}');
+        // Show error to the user.
+      }
+    } catch (error) {
+      print('Error occurred while logging out: $error');
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
@@ -56,9 +83,15 @@ class HomeView extends GetView<HomeController> {
                     radius: 15.r,
                     backgroundImage: const AssetImage(profilepicture),
                   ),
-                  Text(
-                    "Profile",
-                    style: TextStyle(fontSize: 10.sp),
+                  GestureDetector(
+                    onTap: () {
+                      print("object");
+                      logoutUser(StorageServices.to.getString('usertoken'));
+                    },
+                    child: Text(
+                      "Profile",
+                      style: TextStyle(fontSize: 10.sp),
+                    ),
                   )
                 ],
               )

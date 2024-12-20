@@ -6,18 +6,12 @@ import 'package:get_storage/get_storage.dart';
 class AddPassengerController extends GetxController {
   final storage = GetStorage();
   var bookingId = "".obs;
-
-  // RxMap<String, dynamic> dataForDynamicForm = <String, dynamic>{}.obs;
-
   @override
   void onInit() {
     super.onInit();
     String? token = StorageServices.to.getString('usertoken');
-
-    // Print the token to the console for debugging
     print('Retrieved Token: $token');
     bookingId.value = storage.read('bookingReferenceId');
-    // dataForDynamicForm.value = storage.read('dataForDynamicForm');
   }
 
   final nameController = TextEditingController().obs;

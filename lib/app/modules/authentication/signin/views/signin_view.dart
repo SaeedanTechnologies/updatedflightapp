@@ -13,7 +13,9 @@ import 'package:get/get.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class SigninView extends GetView<SigninController> {
-  const SigninView({Key? key}) : super(key: key);
+  @override
+  final SigninController controller = Get.put(SigninController());
+  SigninView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,8 +149,8 @@ class SigninView extends GetView<SigninController> {
                                   .emailController.value.text.isNotEmpty &&
                               controller
                                   .passwordController.value.text.isNotEmpty) {
-                                    controller.signIn();
-                                  }
+                            controller.signIn();
+                          }
                         },
                         textcolor: whitecolor,
                         loading: false,

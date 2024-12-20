@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 import '../modules/Event/bindings/event_binding.dart';
 import '../modules/Event/views/event_view.dart';
 import '../modules/Package/bindings/package_binding.dart';
@@ -15,6 +16,8 @@ import '../modules/authentication/signup/bindings/signup_binding.dart';
 import '../modules/authentication/signup/views/signup_view.dart';
 import '../modules/cardInformation/bindings/card_information_binding.dart';
 import '../modules/cardInformation/views/card_information_view.dart';
+import '../modules/flight/PaymentsGatways/PaymentGatWays/bindings/payment_gat_ways_binding.dart';
+import '../modules/flight/PaymentsGatways/PaymentGatWays/views/payment_gat_ways_view.dart';
 import '../modules/flight/addPassenger/bindings/add_passenger_binding.dart';
 import '../modules/flight/addPassenger/views/add_passenger_view.dart';
 import '../modules/flight/flightDetails/bindings/flight_details_binding.dart';
@@ -72,7 +75,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.SIGNIN,
-      page: () => const SigninView(),
+      page: () => SigninView(),
       binding: SigninBinding(),
     ),
     GetPage(
@@ -189,6 +192,11 @@ class AppPages {
       name: _Paths.EVENT,
       page: () => const EventView(),
       binding: EventBinding(),
+    ),
+    GetPage(
+      name: _Paths.PAYMENT_GAT_WAYS,
+      page: () => PaymentGatWaysView(),
+      binding: PaymentGatWaysBinding(),
     ),
   ];
 }
