@@ -1,9 +1,12 @@
+import 'package:flightbooking/app/models/getResponseModel/hotels/HotelSearchResponseModel.dart';
 import 'package:flightbooking/app/models/getResponseModel/hotels/getSearchedHotesResult.dart';
+import 'package:flightbooking/app/modules/hotels/searchHotels/controllers/rriomcon.dart';
 import 'package:flightbooking/app/repositories/configsRepo/configsRepo.dart';
 import 'package:flightbooking/app/repositories/hotelsRepo/searchHotelsRepo.dart';
 import 'package:get/get.dart';
 
 class SearchHotelsController extends GetxController {
+  final RoomController roomController = Get.put(RoomController());
   @override
   void onInit() {
     super.onInit();
@@ -18,7 +21,7 @@ class SearchHotelsController extends GetxController {
   var selectedAdults = 2.obs;
   var selectedChildren = 0.obs;
   var childAge = 0.obs;
-  var selectedNationality = 'Select Nationality'.obs;
+  var selectedNationality = ''.obs;
   var cityId = 0.obs;
   var countryId = 0.obs;
 
@@ -33,33 +36,74 @@ class SearchHotelsController extends GetxController {
     }
   }
 
-  // Assuming this is the repository you use for making API calls related to hotels
   HotelsRepository hotelsRepository = HotelsRepository();
   ConfigRepository configRepository = ConfigRepository();
   GetSearchedHotelsResponse? getSearchedHotelsResponse;
-  Future<dynamic> getSearchedHotelData() async {
-    // Get configuration data, which includes searcher identity
-    var data = await configRepository.configuration();
 
-    // Send request to get search results
+  Future<HotelSearchResponseModel> getSearchedHotelData() async {
+    //try {
+    var configData = await configRepository.configuration();
+
+    // Fetch the session ID for hotel search
     var getSessionId = await hotelsRepository.getSessionIdForHotelSearch(
-      cityCode: cityId.value, // City ID or name from your logic
-      nationality: countryId.value, // Nationality ID or code
+      cityCode: 623,
+      nationality: 227,
       checkinDate: startDate.value != null ? formatDate(startDate.value!) : '',
       checkOutDate: endDate.value != null ? formatDate(endDate.value!) : '',
-      selectedAdults: selectedAdults.value.toString(),
-      selectedChildren: selectedChildren.value.toString(),
-      childAge: childAge.value.toString(),
-      searchIdentity: data.searcherIdentity, // Use identity from config
+      rooms: roomController.rooms,
+      searchIdentity: configData.searcherIdentity,
     );
-    print(getSessionId);
 
     var result = await hotelsRepository.getsearchHotelResults(
       sessionId: getSessionId.sessionId!,
     );
+    print('Print GetSessionId Value here :${getSessionId.sessionId!} ');
 
-    return result;
+    if (result != null && result is Map<String, dynamic>) {
+      var data = result['data'] ?? [];
+      print('data from map is : $data');
+      if (data is List && data.isEmpty) {
+        print("No hotels found.");
+      }
+
+      // Parse the response body into HotelSearchResponseModel
+      return HotelSearchResponseModel.fromJson(result);
+    } else {
+      throw Exception("Invalid API response.");
+    }
+    // } catch (e) {
+    //   print("Error occurred: $e");
+    //   throw Exception("Failed to load hotel data");
+    // }
   }
+
+  // Future<dynamic> getSearchedHotelData() async {
+  //   // Get configuration data, which includes searcher identity
+  //   var data = await configRepository.configuration();
+
+  //   // Send request to get search results
+  //   print(cityId.value);
+  //   print(countryId.value);
+  //   var getSessionId = await hotelsRepository.getSessionIdForHotelSearch(
+  //     cityCode: cityId.value, // City ID or name from your logic
+  //     nationality: countryId.value, // Nationality ID or code
+  //     checkinDate: startDate.value != null ? formatDate(startDate.value!) : '',
+  //     checkOutDate: endDate.value != null ? formatDate(endDate.value!) : '',
+  //     rooms: roomController.rooms,
+  //     // selectedAdults: selectedAdults.value.toString(),
+  //     // selectedChildren: selectedChildren.value.toString(),
+  //     // childAge: childAge.value.toString(),
+  //     searchIdentity: data.searcherIdentity, // Use identity from config
+  //   );
+
+  //   print(getSessionId);
+
+  //   var result = await hotelsRepository.getsearchHotelResults(
+  //     sessionId: getSessionId.sessionId!,
+  //   );
+
+  //   return result;
+  // }
 
   //adult selection bottom sheet code by murtaza
 

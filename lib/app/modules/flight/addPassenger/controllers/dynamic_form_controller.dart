@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flightbooking/app/modules/flight/PaymentsGatways/PaymentGatWays/views/payment_gat_ways_view.dart';
 import 'package:flightbooking/app/modules/flight/searchFlight/controllers/search_flight_controller.dart';
+import 'package:flightbooking/app/resources/apiKeys.dart';
 import 'package:flightbooking/app/storage/keys.dart';
 import 'package:flightbooking/app/storage/storage.dart';
 import 'package:flutter/material.dart';
@@ -140,7 +141,7 @@ class DynamicFormController extends GetxController {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('https://marketplace.beta.luxota.network/v1/book/guests'),
+      Uri.parse('$baseUrl/book/guests'),
     );
 
     request.headers.addAll({
@@ -270,8 +271,7 @@ class DynamicFormController extends GetxController {
 
   // Fetch countries (for the country code dropdown)
   Future<List<Map<String, dynamic>>> fetchCountries() async {
-    final url =
-        Uri.parse('https://marketplace.beta.luxota.network/v1/countries');
+    final url = Uri.parse('$baseUrl/countries');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {

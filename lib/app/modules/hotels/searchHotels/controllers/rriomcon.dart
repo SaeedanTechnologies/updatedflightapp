@@ -7,10 +7,10 @@ class RoomController extends GetxController {
   RoomController() {
     addRoom(); // Add the first room by default
   }
-  var travellers = 1.obs;
+  var travellers = 0.obs;
   void addRoom() {
     rooms.add({
-      "adults": 1,
+      "adults": 0,
       "children": 0,
       "childAges": [],
     });

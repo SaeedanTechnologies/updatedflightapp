@@ -46,6 +46,7 @@ import '../modules/hotels/recentlyBooked/bindings/recently_booked_binding.dart';
 import '../modules/hotels/recentlyBooked/views/recently_booked_view.dart';
 import '../modules/hotels/searchHotels/bindings/search_hotels_binding.dart';
 import '../modules/hotels/searchHotels/views/search_hotels_view.dart';
+
 import '../modules/onBoarding/getstarted/bindings/getstarted_binding.dart';
 import '../modules/onBoarding/getstarted/views/getstarted_view.dart';
 import '../modules/onBoarding/splashScreen/bindings/splash_screen_binding.dart';
@@ -133,11 +134,11 @@ class AppPages {
       page: () => const RecentlyBookedView(),
       binding: RecentlyBookedBinding(),
     ),
-    GetPage(
-      name: _Paths.HOTEL_DETAILS,
-      page: () => const HotelDetailsView(),
-      binding: HotelDetailsBinding(),
-    ),
+    // GetPage(
+    //   name: _Paths.HOTEL_DETAILS,
+    //   page: () => const HotelDetailsView(hotel: hote,),
+    //   binding: HotelDetailsBinding(),
+    // ),
     GetPage(
       name: _Paths.HOTEL_IMAGES,
       page: () => const HotelImagesView(),

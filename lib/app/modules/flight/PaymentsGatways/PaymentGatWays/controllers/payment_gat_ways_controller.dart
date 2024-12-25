@@ -36,6 +36,7 @@ class PaymentGatWaysController extends GetxController {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
+        print('responsee ${response.body}');
 
         // Accessing the "gateways" key and processing the nested structure
         if (data['gateways'] != null) {

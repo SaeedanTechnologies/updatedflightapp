@@ -18,8 +18,7 @@ class FlightsRepository {
   Future<GetAirports> fetchAirports(String query) async {
     try {
       final response = await http.get(
-        Uri.parse(
-            'https://marketplace.beta.luxota.network/v1/search/airports?q=$query'),
+        Uri.parse('$baseUrl/search/airports?q=$query'),
       );
 
       if (response.statusCode == 200) {
@@ -140,8 +139,7 @@ class FlightsRepository {
   }
 
   Future<dynamic> popularFlights() async {
-    const String url =
-        'https://marketplace.beta.luxota.network/v1/popularroutes/flight?lang=en&currency=158';
+    const String url = '$baseUrl/popularroutes/flight?lang=en&currency=158';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -161,8 +159,7 @@ class FlightsRepository {
   Future<GetRulesModel> getFlightRules(String flightBufferRID) async {
     var storage = GetStorage();
     var referenceId = storage.read('referenceId');
-    final String url =
-        'https://marketplace.beta.luxota.network/v1/profile/flight?referenceId=$referenceId';
+    final String url = '$baseUrl/profile/flight?referenceId=$referenceId';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -181,8 +178,7 @@ class FlightsRepository {
   }
 
   Future<void> createBookingRequest() async {
-    const String url =
-        "https://marketplace.beta.luxota.network/v1/book/flight/create";
+    const String url = "$baseUrl/book/flight/create";
 
     final storage = GetStorage();
     String? referenceId = storage.read('referenceId');
@@ -223,8 +219,7 @@ class FlightsRepository {
   }
 
   Future<void> fetchBookingInformation(String bookingId) async {
-    final String url =
-        'https://marketplace.beta.luxota.network/v1/book/$bookingId/bookingInformation';
+    final String url = '$baseUrl/book/$bookingId/bookingInformation';
 
     try {
       final response = await http.get(
@@ -258,7 +253,7 @@ class FlightsRepository {
   //passengerInfo api
 
   Future<void> bookGuest() async {
-    const String url = "https://marketplace.beta.luxota.network/v1/book/guests";
+    const String url = "$baseUrl/book/guests";
 
     var requestBody = {
       "referenceId": "1ber4sdc91pk1lzguv37r44675141088b34f",

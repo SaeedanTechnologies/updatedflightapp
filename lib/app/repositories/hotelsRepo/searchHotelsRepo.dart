@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 class HotelsRepository {
 // code by murtaza  start from here
 
-  final String _cityUrl = 'https://marketplace.beta.luxota.network/v1/cities';
+  final String _cityUrl = '$baseUrl/cities';
 
   Future<GetCities> fetchCities(String query) async {
     try {
@@ -35,8 +35,7 @@ class HotelsRepository {
     }
   }
 
-  static const String baseUrlCountry =
-      'https://marketplace.beta.luxota.network/v1/countries';
+  static const String baseUrlCountry = '$baseUrl/countries';
 
   Future<List<CountryData>> fetchCountries() async {
     try {
@@ -60,8 +59,7 @@ class HotelsRepository {
 
   Future getPopularDestinations() async {
     // URL
-    String url =
-        "https://marketplace.beta.luxota.network/v1/popularroutes/hotel";
+    String url = "$baseUrl/popularroutes/hotel";
 
     // Parameters
     Map<String, String> parameters = {
@@ -92,63 +90,128 @@ class HotelsRepository {
 
   ConfigRepository configRepository = ConfigRepository();
 
+  // Future<GetSessionId> getSessionIdForHotelSearch({
+  //   int? cityCode,
+  //   int? nationality,
+  //   String? checkinDate,
+  //   String? checkOutDate,
+  //   String? selectedAdults,
+  //   String? selectedChildren,
+  //   String? childAge,
+  //   String? searchIdentity,
+  // }) async {
+  //   Map<String, dynamic> formData = {
+  //     "city": cityCode.toString(),
+  //     "nationality": nationality.toString(),
+  //     "checkInDate": checkinDate ?? "",
+  //     "checkOutDate": checkOutDate ?? "",
+  //     // "rooms[0][adults]": 2.toString(),
+  //     // "rooms[0][children]": 1.toString(),
+  //     // "rooms[0][child-age][1]": 2.toString(),
+  //     "searcherIdentity": searchIdentity ?? "",
+  //   };
+
+  //   // Log the form data
+  //   print('Form Data: $formData');
+
+  //   try {
+  //     EasyLoading.show(status: "Searching Hotels");
+
+  //     String body = formData.entries
+  //         .map((entry) =>
+  //             '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}')
+  //         .join('&');
+
+  //     final response = await http.post(
+  //       Uri.parse(
+  //           'https://marketplace.beta.luxota.network/v1/search/hotel?lang=en&currency=158'),
+  //       body: body,
+  //       headers: <String, String>{
+  //         'Content-Type': 'application/x-www-form-urlencoded',
+  //       },
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       EasyLoading.dismiss();
+  //       Map<String, dynamic> data = json.decode(response.body);
+  //       print(data);
+  //       return GetSessionId.fromJson(data);
+  //     } else {
+  //       EasyLoading.dismiss();
+  //       print("API Response: ${response.body}");
+  //       Utils.snakbar(title: "Error", body: response.body);
+  //       throw Exception("Failed to load data: ${response.body}");
+  //     }
+  //   } catch (error) {
+  //     EasyLoading.dismiss();
+  //     print("Error occurred: $error");
+  //     throw Exception("An error occurred while making the request.");
+  //   }
+  // }
+
   Future<GetSessionId> getSessionIdForHotelSearch({
-    int? cityCode,
-    int? nationality,
-    String? checkinDate,
-    String? checkOutDate,
-    String? selectedAdults,
-    String? selectedChildren,
-    String? childAge,
+    required int cityCode,
+    required int nationality,
+    required String checkinDate,
+    required String checkOutDate,
+    required List<Map<String, dynamic>> rooms, // Pass the list of rooms here
     String? searchIdentity,
   }) async {
     Map<String, dynamic> formData = {
-      "city": cityCode.toString(),
-      "nationality": nationality.toString(),
-      "checkInDate": checkinDate ?? "",
-      "checkOutDate": checkOutDate ?? "",
-      "rooms[0][adults]": 2.toString(),
-      "rooms[0][children]": 1.toString(),
-      "rooms[0][child-age][1]": 2.toString(),
+      "city": cityCode,
+      "nationality": nationality,
+      "checkInDate": checkinDate,
+      "checkOutDate": checkOutDate,
       "searcherIdentity": searchIdentity ?? "",
     };
 
-    // Log the form data
-    print('Form Data: $formData');
+    // Dynamically add room data to the formData
+    for (int i = 0; i < rooms.length; i++) {
+      formData["rooms[$i][adults]"] = rooms[i]["adults"].toString();
+      formData["rooms[$i][children]"] = rooms[i]["children"].toString();
 
-    try {
-      EasyLoading.show(status: "Searching Hotels");
-
-      String body = formData.entries
-          .map((entry) =>
-              '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}')
-          .join('&');
-
-      final response = await http.post(
-        Uri.parse(
-            'https://marketplace.beta.luxota.network/v1/search/hotel?lang=en&currency=158'),
-        body: body,
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        EasyLoading.dismiss();
-        Map<String, dynamic> data = json.decode(response.body);
-        print(data);
-        return GetSessionId.fromJson(data);
-      } else {
-        EasyLoading.dismiss();
-        print("API Response: ${response.body}");
-        Utils.snakbar(title: "Error", body: response.body);
-        throw Exception("Failed to load data: ${response.body}");
+      // Add child ages if there are children in the room
+      List<dynamic> childAges = rooms[i]["childAges"];
+      for (int j = 0; j < childAges.length; j++) {
+        formData["rooms[$i][child-age][$j]"] = childAges[j].toString();
       }
-    } catch (error) {
-      EasyLoading.dismiss();
-      print("Error occurred: $error");
-      throw Exception("An error occurred while making the request.");
     }
+
+    print('Form Dataaa: $formData');
+
+    //try {
+    EasyLoading.show(status: "Searching Hotels");
+
+    String body = formData.entries
+        .map((entry) =>
+            '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value.toString())}')
+        .join('&');
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/search/hotel?lang=en&currency=158'),
+      body: body,
+      headers: <String, String>{
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      EasyLoading.dismiss();
+      Map<String, dynamic> hoterSearchSessionID = json.decode(response.body);
+      print('Hotel search Session ID is: $hoterSearchSessionID');
+
+      return GetSessionId.fromJson(hoterSearchSessionID);
+    } else {
+      EasyLoading.dismiss();
+      print("API Response: ${response.body}");
+      Utils.snakbar(title: "Error", body: response.body);
+      throw Exception("Failed to load data: ${response.body}");
+    }
+    // } catch (error) {
+    //   EasyLoading.dismiss();
+    //   print("Error occurred: $error");
+    //   throw Exception("An error occurred while making the request.");
+    // }
   }
 
   Future<dynamic> getsearchHotelResults({
@@ -166,7 +229,7 @@ class HotelsRepository {
       // Parse the JSON response
 
       var data = json.decode(response.body);
-      print(data);
+      print('results of Search Hotels $data');
       // Get.toNamed(Routes.SEARCH_, arguments: [data,]);
 
       return data;
@@ -175,6 +238,23 @@ class HotelsRepository {
       throw Exception();
     }
   }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+
+////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 //   Future<GetSessionId> getSessionIdForHotelSearch({
 //     Int? cityCode,

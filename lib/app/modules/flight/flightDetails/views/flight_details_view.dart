@@ -5,7 +5,6 @@ import 'package:flightbooking/app/resources/alignments.dart';
 import 'package:flightbooking/app/resources/colors.dart';
 import 'package:flightbooking/app/resources/icons.dart';
 import 'package:flightbooking/app/resources/paddings.dart';
-import 'package:flightbooking/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
